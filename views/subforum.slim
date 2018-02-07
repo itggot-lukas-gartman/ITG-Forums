@@ -1,0 +1,16 @@
+a.button href="./new" New thread
+-if @threads.length == 0
+    p This subforum is empty
+-else
+    p There are #{@threads.length} threads in this subforum
+-for thread in @threads.reverse
+    div.post-container
+        div.post-info
+            a href="/thread/#{thread[0]}" #{thread[1]}
+            p
+                | By 
+                a href="/profile/#{thread[3]}"
+                    | #{thread[3]}
+                |, #{DateTime.parse(thread[6]).strftime("%F")}
+        div.post-date
+            p latest post here

@@ -1,0 +1,45 @@
+doctype html
+html
+	head
+		meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"
+		meta charset="utf-8"
+		script src="/js/main.js"
+		/ script src="https://use.fontawesome.com/4b25903ade.js"
+		link rel="stylesheet" href="/css/main.css"
+		link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,700"
+		
+		title = @title
+	body
+		header
+			div.header-container
+				div.logo-container
+					a.logo href="/" ITG Forums
+				div.user-container
+					-unless $user
+						div.link onclick="toggleLogin()" Existing user? Sign in
+						img.caret-down src="../img/caret-down.svg" onclick="toggleLogin()"
+						/ i.fa.fa-caret-down aria-hidden="true" onclick="toggleLogin()"
+						
+						div.login-form.hidden id="login-form"
+							form action="login" method="POST"
+								input type="text" name="username" placeholder="Username"
+								input type="password" name="password" placeholder="Password"
+								input type="submit" value="Login"
+								
+					-if $user
+						img.profile-picture src="#{session[:profile_picture]}" onclick="toggleProfile()"
+						div.link onclick="toggleProfile()" #{$user}
+						i.fa.fa-caret-down aria-hidden="true" onclick="toggleProfile()"
+					
+						div.user-menu.hidden id="user-menu"
+							a href="/profile/#{$user}" Profile
+							a href="/settings" Account settings
+							a href="/logout" Logout
+					-else
+						a.button href="/register" Sign up
+		main
+			nav
+				a.navitem href="/" Home
+				a.navitem href="/activity" Activity
+				a.navitem href="/members" Members
+			== yield
