@@ -4,13 +4,13 @@ a.button href="./new" New thread
 -else
     p There are #{@threads.length} threads in this subforum
 -for thread in @threads.reverse
-    div.post-container
-        div.post-info
+    div.thread-container
+        div.thread-info
             a href="/thread/#{thread[0]}" #{thread[1]}
             p
                 | By 
                 a href="/profile/#{thread[3]}"
                     | #{thread[3]}
                 |, #{DateTime.parse(thread[6]).strftime("%F")}
-        div.post-date
+        div.thread-date
             p latest post here

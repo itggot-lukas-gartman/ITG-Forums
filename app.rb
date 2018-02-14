@@ -49,8 +49,16 @@ class App < Sinatra::Base
 		password = params['password']
 		email = params['email'].downcase
 		encrypted_pass = BCrypt::Password.create(password)
-
-		if !/^[a-zA-Z0-9_]\w{2,15}$/.match(username)
+		username_check = db.execute("SELECT username FROM accounts WHERE username = ?", username).first 
+		email_check = db.execute("SELECT email FROM accounts WHERE email = ?", email).first
+		
+		if !username_check.nil?
+			flash[:error] = "Username already exists"
+			redirect back
+		elsif !email_check.nil?
+			flash[:error] = "Email is already in use"
+			redirect back
+		elsif !/^[a-zA-Z0-9_]\w{2,15}$/.match(username)
 			flash[:error] = "Username may only contain characters (A-Z), numbers (0-9), underscores and be 3-16 characters long"
 			redirect back
 		elsif !/\A([\w+\-].?)+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/i.match(email)
@@ -60,20 +68,12 @@ class App < Sinatra::Base
 			flash[:error] = "Password must be at least 6 characters long"
 			redirect back
 		else
-			if db.execute("SELECT username FROM accounts WHERE username = ?", username).first.first == username
-				flash[:error] = "Username already exists"
-				redirect back
-			elsif db.execute("SELECT email FROM accounts WHERE email = ?", email).first.first == email
-				flash[:error] = "Email is already in use"
-				redirect back
-			else
-				db.execute("INSERT INTO accounts (username, encrypted_pass, email) VALUES (?, ?, ?)", username, encrypted_pass, email)
-				session[:username] = username
-				session[:profile_picture] = "uploads/profile-picture/default.png"
-				$user = session[:username]
-				flash[:success] = "Account registered. Welcome to ITG forums!"
-				redirect '/'
-			end
+			db.execute("INSERT INTO accounts (username, encrypted_pass, email) VALUES (?, ?, ?)", username, encrypted_pass, email)
+			session[:username] = username
+			session[:profile_picture] = "/uploads/profile-picture/default.png"
+			$user = session[:username]
+			flash[:success] = "Account registered. Welcome to ITG forums!"
+			redirect '/'
 		end
 	end
 	
@@ -173,7 +173,7 @@ class App < Sinatra::Base
 		id = params['id']
 		@thread = db.execute("SELECT * FROM threads WHERE id = ?", id).first
 		@posts = db.execute("SELECT * FROM posts WHERE thread = ?", id)
-		slim :post
+		slim :thread
 	end
 
 	

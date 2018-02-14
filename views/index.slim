@@ -12,7 +12,7 @@ div.categories
 						div.subforum-info
 							a href="/subforum/#{subforum[0]}" #{subforum[1]}
 							p #{subforum[2]}
-						div.subforum-lastpost
+						div.subforum-last_thread
 							-subforum_thread = []
 							-for thread in @threadinfo
 
@@ -20,7 +20,7 @@ div.categories
 									-subforum_thread << thread
 
 							-if subforum_thread[-1].nil?
-								p No posts
+								p No threads
 							-else
 								a href="/thread/#{subforum_thread[-1][0]}" #{subforum_thread[-1][2]}
 								

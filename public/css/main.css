@@ -138,7 +138,7 @@ header {
 }
 
 .button:hover {
-	background-color: #597489;
+	background-color: #3c5972;
 }
 
 .caret-down {
@@ -275,7 +275,7 @@ main {
 	min-width: 100px;
 } */
 
-.subforum-lastpost {
+.subforum-last_thread {
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
@@ -286,24 +286,24 @@ main {
 	white-space: nowrap;
 }
 
-.subforum-lastpost > a, span > a {
+.subforum-last_thread > a, span > a {
 	text-decoration: none;
 }
 
-.subforum-lastpost > span {
+.subforum-last_thread > span {
 	margin: 5px 0;
 	font-size: 0.9em;
 }
 
 
-.post-container {
+.thread-container {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
 	padding: 10px;
 }
 
-.post-container > p {
+.thread-container > p {
 	margin: 0;
 }
 
@@ -375,5 +375,12 @@ form[action="settings/password"] > input[type="text"], form[action="settings/pas
 
 	.login-form {
 		right: 12vw;
+	}
+}
+
+@media screen and (min-width: calc(1300px + 20vw)) {
+	.login-form {
+		/* right: 250px; */
+		right: 20%;
 	}
 }

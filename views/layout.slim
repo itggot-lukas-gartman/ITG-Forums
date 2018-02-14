@@ -17,8 +17,7 @@ html
 				div.user-container
 					-unless $user
 						div.link onclick="toggleLogin()" Existing user? Sign in
-						img.caret-down src="../img/caret-down.svg" onclick="toggleLogin()"
-						/ i.fa.fa-caret-down aria-hidden="true" onclick="toggleLogin()"
+						img.caret-down src="/img/caret-down.svg" onclick="toggleLogin()"
 						
 						div.login-form.hidden id="login-form"
 							form action="login" method="POST"
@@ -29,7 +28,7 @@ html
 					-if $user
 						img.profile-picture src="#{session[:profile_picture]}" onclick="toggleProfile()"
 						div.link onclick="toggleProfile()" #{$user}
-						i.fa.fa-caret-down aria-hidden="true" onclick="toggleProfile()"
+						img.caret-down src="/img/caret-down.svg" onclick="toggleProfile()"
 					
 						div.user-menu.hidden id="user-menu"
 							a href="/profile/#{$user}" Profile
