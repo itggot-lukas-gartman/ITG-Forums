@@ -13,10 +13,17 @@ class App < Sinatra::Base
 	db = SQLite3::Database.open('db/database.sqlite')
 	$user = false
 	$admin = false
-	
+
+
+	# not_found do
+	# 	session[:url] = request.path
+	# end
+
 	get '/not_found' do
 		status 404
 		@title = "ITG Forums | Not found"
+		@url = session[:url]
+		session[:url] = ""
 		slim :'utils/not_found'
 	end
 	
@@ -165,6 +172,12 @@ class App < Sinatra::Base
 
 	get '/subforum/:id' do
 		id = params['id']
+		begin
+		@subforum = db.execute("SELECT name FROM subforums WHERE id = ?", id).first.first
+		rescue
+			session[:url] = request.path
+			redirect :not_found
+		end
 		@threads = db.execute("SELECT * FROM threads WHERE subforum = ?", id)
 		slim :subforum
 	end
