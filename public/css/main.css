@@ -252,14 +252,14 @@ main {
 	text-decoration: none;
 }
 
-.subforum-info {
+.subforum-info, .thread-info {
 	display: flex;
 	flex-direction: column;
 	width: auto;
 }
 
-.subforum-info > a {
-	display: inline-block;
+.subforum-info > a, .thread-info > a, .subforum-last_thread > a {
+	/* display: inline-block; */
 	font-size: 1.2em;
 }
 
@@ -273,6 +273,9 @@ main {
 	justify-content: center;
 	width: 25%;
 	min-width: 120px;
+}
+
+.subforum-last_thread > a {
 	text-overflow: ellipsis;
 	overflow: hidden;
 	white-space: nowrap;
@@ -311,10 +314,10 @@ main {
 	margin: 5px 0;
 }
 
-.thread-info {
+/* .thread-info {
 	display: flex;
 	flex-direction: column;
-}
+} */
 
 
 /* Register account */
