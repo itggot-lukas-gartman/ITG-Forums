@@ -170,6 +170,7 @@ header {
 .profile-picture {
 	border-radius: 10px;
 	margin-right: 5px;
+	width: 30px;
 	cursor: pointer;
 }
 
@@ -258,7 +259,7 @@ main {
 	width: auto;
 }
 
-.subforum-info > a, .thread-info > a, .subforum-last_thread > a {
+.subforum-info > a, .subforum-last_thread > a, .thread-info > a, .thread-stats > .last-post > a {
 	/* display: inline-block; */
 	font-size: 1.2em;
 }
@@ -314,10 +315,25 @@ main {
 	margin: 5px 0;
 }
 
-/* .thread-info {
+.thread-stats {
 	display: flex;
-	flex-direction: column;
-} */
+	flex-direction: row;
+	width: 25%;
+	min-width: 120px;
+}
+
+.last-post > p {
+	margin: 5px 0 0 0;
+}
+
+.picture {
+	width: 50px;
+	align-self: center;
+}
+
+.picture > a > .profile-picture {
+	width: 40px;
+}
 
 
 /* Register account */

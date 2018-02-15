@@ -2,4 +2,7 @@ div.not-found
     -if @url == ""
         p Sorry, the page you were trying to reach could not be found. If you believe this is an error, please contact an administrator.
     -else
-        p Sorry, #{@url} could not be found. If you believe this is an error, please contact an administrator.
+        p
+            | Sorry, 
+            strong #{@url} 
+            | could not be found. If you believe this is an error, please contact an administrator.

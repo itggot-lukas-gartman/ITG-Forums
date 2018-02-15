@@ -7,6 +7,7 @@ div.categories
 				| #{forum[1]}
 			/* -for subforum in @subforums */
 			-@subforums.each_with_index do |subforum, i|
+				-p subforum
 				-if subforum[3] == forum[0]
 					div.subforum
 						div.subforum-info

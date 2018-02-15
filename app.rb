@@ -16,7 +16,8 @@ class App < Sinatra::Base
 
 
 	# not_found do
-	# 	session[:url] = request.path
+	# 	session[:url] = request.fullpath
+	# 	redirect '/not_found'
 	# end
 
 	get '/not_found' do
@@ -77,7 +78,7 @@ class App < Sinatra::Base
 		else
 			db.execute("INSERT INTO accounts (username, encrypted_pass, email) VALUES (?, ?, ?)", username, encrypted_pass, email)
 			session[:username] = username
-			session[:profile_picture] = "/uploads/profile-picture/default.png"
+			session[:profile_picture] = "/uploads/profile-picture/default.svg"
 			$user = session[:username]
 			flash[:success] = "Account registered. Welcome to ITG forums!"
 			redirect '/'
@@ -173,12 +174,34 @@ class App < Sinatra::Base
 	get '/subforum/:id' do
 		id = params['id']
 		begin
-		@subforum = db.execute("SELECT name FROM subforums WHERE id = ?", id).first.first
+			@subforum = db.execute("SELECT name FROM subforums WHERE id = ?", id).first.first
 		rescue
-			session[:url] = request.path
-			redirect :not_found
+			session[:url] = request.fullpath
+			redirect '/not_found'
 		end
 		@threads = db.execute("SELECT * FROM threads WHERE subforum = ?", id)
+		@latest_posts = []
+		for thread in @threads
+			post = db.execute("SELECT thread, owner, date FROM posts WHERE thread = ?", thread[0]).last
+
+			if post.nil?
+				profile_picture = db.execute("SELECT picture FROM accounts WHERE username = ?", thread[3]).first.first
+				post = [false, thread[0]]
+				post.push(profile_picture)
+				@latest_posts.push(post)
+			else
+				profile_picture = db.execute("SELECT picture FROM accounts WHERE username = ?", post[1]).first.first
+				post.push(profile_picture)
+				@latest_posts.push(post)
+			end
+
+			# unless post.nil?
+			# 	profile_picture = db.execute("SELECT picture FROM accounts WHERE username = ?", post[1]).first.first
+			# 	post.push(profile_picture)
+			# 	@latest_posts.push(post)
+			# end
+		end
+		p @latest_posts
 		slim :subforum
 	end
 
