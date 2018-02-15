@@ -1,16 +1,20 @@
-a.button href="./new" New thread
--if @threads.length == 0
-    p This subforum is empty
--else
-    p There are #{@threads.length} threads in this subforum
--for thread in @threads.reverse
-    div.thread-container
-        div.thread-info
-            a href="/thread/#{thread[0]}" #{thread[1]}
-            p
-                | By 
-                a href="/profile/#{thread[3]}"
-                    | #{thread[3]}
-                |, #{DateTime.parse(thread[6]).strftime("%F")}
-        div.thread-date
-            p latest post here
+div.threads
+    div.subforum-tools
+        h2 #{@subforum}
+        a.button href="./new" New thread
+    div.category-header
+        -if @threads.length == 0
+            p This subforum is empty
+        -else
+            p There are #{@threads.length} threads in this subforum
+    -for thread in @threads.reverse
+        div.thread-container
+            div.thread-info
+                a href="/thread/#{thread[0]}" #{thread[1]}
+                span
+                    | By 
+                    a href="/profile/#{thread[3]}"
+                        | #{thread[3]}
+                    |, #{DateTime.parse(thread[6]).strftime("%F")}
+            div.thread-date
+                p latest post here
