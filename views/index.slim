@@ -2,27 +2,101 @@
 div.categories
 	h2 Forum categories
 	-for forum in @forums
-		div.category
-			div.category-header
-				| #{forum[1]}
-			/* -for subforum in @subforums */
-			-@subforums.each_with_index do |subforum, i|
-				-if subforum[3] == forum[0]
-					div.subforum
-						div.subforum-info
-							a href="/subforum/#{subforum[0]}" #{subforum[1]}
-							p #{subforum[2]}
-						div.subforum-last_thread
-							-subforum_thread = []
-							-for thread in @threadinfo
-								-if thread[1] == subforum[0]
-									-subforum_thread << thread
-							-if subforum_thread[-1].nil?
-								p No threads
-							-else
-								a href="/thread/#{subforum_thread[-1][0]}" #{subforum_thread[-1][2]}
-								span
-									| By 
-									a href="/profile/#{subforum_thread[-1][3]}"
-										| #{subforum_thread[-1][3]}
-									|, #{DateTime.parse(subforum_thread[-1][-1]).strftime("%F")}
+		-if $admin
+			div.category
+				div.divider #{forum[1]}
+				-for subforum in @subforums
+					-if subforum[3] == forum[0]
+						div.subforum
+							div.subforum-info
+								a href="/subforum/#{subforum[0]}" #{subforum[1]}
+								p #{subforum[2]}
+							div.subforum-last_thread
+								-subforum_thread = []
+								-for thread in @threadinfo
+									-if thread[1] == subforum[0]
+										-subforum_thread << thread
+								-if subforum_thread[-1].nil?
+									p No threads
+								-else
+									a href="/thread/#{subforum_thread[-1][0]}" #{subforum_thread[-1][2]}
+									span
+										| By 
+										a href="/profile/#{subforum_thread[-1][3]}"
+											| #{subforum_thread[-1][3]}
+										|, #{DateTime.parse(subforum_thread[-1][-1]).strftime("%F")}
+
+		-elsif $mod
+			-if forum[2] <= 2
+				div.category
+					div.divider #{forum[1]}
+					-for subforum in @subforums
+						-if subforum[3] == forum[0]
+							div.subforum
+								div.subforum-info
+									a href="/subforum/#{subforum[0]}" #{subforum[1]}
+									p #{subforum[2]}
+								div.subforum-last_thread
+									-subforum_thread = []
+									-for thread in @threadinfo
+										-if thread[1] == subforum[0]
+											-subforum_thread << thread
+									-if subforum_thread[-1].nil?
+										p No threads
+									-else
+										a href="/thread/#{subforum_thread[-1][0]}" #{subforum_thread[-1][2]}
+										span
+											| By 
+											a href="/profile/#{subforum_thread[-1][3]}"
+												| #{subforum_thread[-1][3]}
+											|, #{DateTime.parse(subforum_thread[-1][-1]).strftime("%F")}
+
+		-elsif $user
+			-if forum[2] <= 1
+				div.category
+					div.divider #{forum[1]}
+					-for subforum in @subforums
+						-if subforum[3] == forum[0]
+							div.subforum
+								div.subforum-info
+									a href="/subforum/#{subforum[0]}" #{subforum[1]}
+									p #{subforum[2]}
+								div.subforum-last_thread
+									-subforum_thread = []
+									-for thread in @threadinfo
+										-if thread[1] == subforum[0]
+											-subforum_thread << thread
+									-if subforum_thread[-1].nil?
+										p No threads
+									-else
+										a href="/thread/#{subforum_thread[-1][0]}" #{subforum_thread[-1][2]}
+										span
+											| By 
+											a href="/profile/#{subforum_thread[-1][3]}"
+												| #{subforum_thread[-1][3]}
+											|, #{DateTime.parse(subforum_thread[-1][-1]).strftime("%F")}
+
+		-else
+			-if forum[2] == 0
+				div.category
+					div.divider #{forum[1]}
+					-for subforum in @subforums
+						-if subforum[3] == forum[0]
+							div.subforum
+								div.subforum-info
+									a href="/subforum/#{subforum[0]}" #{subforum[1]}
+									p #{subforum[2]}
+								div.subforum-last_thread
+									-subforum_thread = []
+									-for thread in @threadinfo
+										-if thread[1] == subforum[0]
+											-subforum_thread << thread
+									-if subforum_thread[-1].nil?
+										p No threads
+									-else
+										a href="/thread/#{subforum_thread[-1][0]}" #{subforum_thread[-1][2]}
+										span
+											| By 
+											a href="/profile/#{subforum_thread[-1][3]}"
+												| #{subforum_thread[-1][3]}
+											|, #{DateTime.parse(subforum_thread[-1][-1]).strftime("%F")}

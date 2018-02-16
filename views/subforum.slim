@@ -2,11 +2,11 @@ div.threads
     div.subforum-tools
         h2 #{@subforum}
         a.button href="./new" New thread
-    div.category-header
+    div.divider
         -if @threads.length == 0
-            p This subforum is empty
+            | This subforum is empty
         -else
-            p There are #{@threads.length} threads in this subforum
+            | There are #{@threads.length} threads in this subforum
     -for thread in @threads.reverse
         div.thread-container
             div.thread-info

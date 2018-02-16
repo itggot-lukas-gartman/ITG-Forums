@@ -12,8 +12,8 @@ class App < Sinatra::Base
 	
 	db = SQLite3::Database.open('db/database.sqlite')
 	$user = false
-	$admin = false
 	$mod = false
+	$admin = false
 
 	# not_found do
 	# 	session[:url] = request.fullpath
@@ -98,10 +98,10 @@ class App < Sinatra::Base
 				session[:username] = username
 				$user = session[:username]
 				session[:profile_picture] = credentials[2]
-				rank = db.execute("SELECT rank FROM accounts WHERE username = ?", username).first
-				if rank == 2
+				rank = db.execute("SELECT rank FROM accounts WHERE username = ?", username).first.first
+				if rank == 3
 					$admin = true
-				elsif rank == 1
+				elsif rank == 2
 					$mod = true
 				end
 				redirect back
@@ -116,6 +116,7 @@ class App < Sinatra::Base
 		if session[:username]
 			session.destroy
 			$user = false
+			$mod = false
 			$admin = false
 			redirect '/'
 		else
@@ -217,7 +218,8 @@ class App < Sinatra::Base
 	end
 
 	get '/activity' do
-		@posts = db.execute("")
+		# @posts = db.execute("")
+		"Not implemented yet"
 	end
 
 	get '/users' do
@@ -229,9 +231,9 @@ class App < Sinatra::Base
 		@users = []
 		
 		for account in accounts
-			if account[4] == 2
+			if account[4] == 3
 				@admins.push(account)
-			elsif account[4] == 1
+			elsif account[4] == 2
 				@mods.push(account)
 			else
 				@users.push(account)

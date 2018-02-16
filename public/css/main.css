@@ -229,7 +229,7 @@ main {
 	margin: 10px;
 }
 
-.category-header {
+.divider {
 	display: flex;
 	align-items: center;
 	height: 40px;
