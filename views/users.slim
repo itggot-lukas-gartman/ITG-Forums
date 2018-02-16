@@ -1,8 +1,7 @@
 div.users
     -unless @admins.nil?
         div.user-group
-            div.category-header
-                p Administrators
+            div.divider Administrators
             -for admin in @admins
                 div.user
                     div.user-picture
@@ -10,12 +9,11 @@ div.users
                             img.profile-picture src="#{admin[5]}"
                     div.user-info
                         a href="/profile/#{admin[1]}" #{admin[1]}
-                        p Last seen: #{admin[6]}
+                        p Last seen: #{DateTime.parse(admin[6]).strftime("%F at %l:%M %p")}
                     
     -unless @mods.nil?
         div.user-group
-            div.category-header
-                p Moderators
+            div.divider Moderators
             -for mod in @mods
                 div.user
                     div.user-picture
@@ -23,12 +21,11 @@ div.users
                             img.profile-picture src="#{mod[5]}"
                     div.user-info
                         a href="/profile/#{mod[1]}" #{mod[1]}
-                        p Last seen: #{mod[6]}
+                        p Last seen: #{DateTime.parse(mod[6]).strftime("%F at %l:%M %p")}
 
     -unless @users.nil?
         div.user-group
-            div.category-header
-                p Users
+            div.divider Users
             -for user in @users
                 div.user
                     div.user-picture
