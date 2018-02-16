@@ -7,7 +7,6 @@ div.categories
 				| #{forum[1]}
 			/* -for subforum in @subforums */
 			-@subforums.each_with_index do |subforum, i|
-				-p subforum
 				-if subforum[3] == forum[0]
 					div.subforum
 						div.subforum-info
@@ -16,15 +15,12 @@ div.categories
 						div.subforum-last_thread
 							-subforum_thread = []
 							-for thread in @threadinfo
-
 								-if thread[1] == subforum[0]
 									-subforum_thread << thread
-
 							-if subforum_thread[-1].nil?
 								p No threads
 							-else
 								a href="/thread/#{subforum_thread[-1][0]}" #{subforum_thread[-1][2]}
-								
 								span
 									| By 
 									a href="/profile/#{subforum_thread[-1][3]}"

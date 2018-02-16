@@ -384,6 +384,47 @@ form[action="settings/password"] > input[type="text"], form[action="settings/pas
 }
 
 
+/* Users */
+.users {
+	margin: 10px;
+}
+
+.user-group {
+	display: flex;
+	flex-direction: column;
+}
+
+.user {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	width: auto;
+	margin: 10px 0;
+}
+
+.user-info > a {
+	text-decoration: none;
+	font-size: 1.2em;
+	/* color: black; */
+}
+
+.user-info > p {
+	margin: 5px 0;
+}
+
+.user-picture {
+	display: flex;
+	flex-direction: column;
+	width: 50px;
+	align-self: center;
+	margin: 5px 10px 5px 0;
+}
+
+.user-picture > a > .profile-picture {
+	width: 50px;
+}
+
+
 @media screen and (max-width: 1000px) {
 	main {
 		width: 95vw;

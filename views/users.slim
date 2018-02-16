@@ -1,0 +1,39 @@
+div.users
+    -unless @admins.nil?
+        div.user-group
+            div.category-header
+                p Administrators
+            -for admin in @admins
+                div.user
+                    div.user-picture
+                        a href="/profile/#{admin[1]}"
+                            img.profile-picture src="#{admin[5]}"
+                    div.user-info
+                        a href="/profile/#{admin[1]}" #{admin[1]}
+                        p Last seen: #{admin[6]}
+                    
+    -unless @mods.nil?
+        div.user-group
+            div.category-header
+                p Moderators
+            -for mod in @mods
+                div.user
+                    div.user-picture
+                        a href="/profile/#{mod[1]}"
+                            img.profile-picture src="#{mod[5]}"
+                    div.user-info
+                        a href="/profile/#{mod[1]}" #{mod[1]}
+                        p Last seen: #{mod[6]}
+
+    -unless @users.nil?
+        div.user-group
+            div.category-header
+                p Users
+            -for user in @users
+                div.user
+                    div.user-picture
+                        a href="/profile/#{user[1]}"
+                            img.profile-picture src="#{user[5]}"
+                    div.user-info
+                        a href="/profile/#{user[1]}" #{user[1]}
+                        p Last seen: #{DateTime.parse(user[6]).strftime("%F at %l:%M %p")}

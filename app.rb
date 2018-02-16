@@ -13,7 +13,7 @@ class App < Sinatra::Base
 	db = SQLite3::Database.open('db/database.sqlite')
 	$user = false
 	$admin = false
-
+	$mod = false
 
 	# not_found do
 	# 	session[:url] = request.fullpath
@@ -98,6 +98,12 @@ class App < Sinatra::Base
 				session[:username] = username
 				$user = session[:username]
 				session[:profile_picture] = credentials[2]
+				rank = db.execute("SELECT rank FROM accounts WHERE username = ?", username).first
+				if rank == 2
+					$admin = true
+				elsif rank == 1
+					$mod = true
+				end
 				redirect back
 			else
 				flash[:error] = "Invalid username or password"
@@ -173,12 +179,15 @@ class App < Sinatra::Base
 
 	get '/subforum/:id' do
 		id = params['id']
+
 		begin
 			@subforum = db.execute("SELECT name FROM subforums WHERE id = ?", id).first.first
+			@title = "ITG Forums | #{@subforum}"
 		rescue
 			session[:url] = request.fullpath
 			redirect '/not_found'
 		end
+
 		@threads = db.execute("SELECT * FROM threads WHERE subforum = ?", id)
 		@latest_posts = []
 		for thread in @threads
@@ -194,28 +203,41 @@ class App < Sinatra::Base
 				post.push(profile_picture)
 				@latest_posts.push(post)
 			end
-
-			# unless post.nil?
-			# 	profile_picture = db.execute("SELECT picture FROM accounts WHERE username = ?", post[1]).first.first
-			# 	post.push(profile_picture)
-			# 	@latest_posts.push(post)
-			# end
 		end
-		p @latest_posts
+
 		slim :subforum
 	end
 
 	get '/thread/:id' do
 		id = params['id']
 		@thread = db.execute("SELECT * FROM threads WHERE id = ?", id).first
+		@title = "ITG Forums | #{@thread[1]}"
 		@posts = db.execute("SELECT * FROM posts WHERE thread = ?", id)
 		slim :thread
 	end
 
-	
-	get '/members' do
-		@title = "ITG Forums | Members"
-		@members = db.execute("SELECT username, rank FROM accounts")
-		slim :members
+	get '/activity' do
+		@posts = db.execute("")
+	end
+
+	get '/users' do
+		@title = "ITG Forums | Users"
+		accounts = db.execute("SELECT * FROM accounts")
+
+		@admins = []
+		@mods = []
+		@users = []
+		
+		for account in accounts
+			if account[4] == 2
+				@admins.push(account)
+			elsif account[4] == 1
+				@mods.push(account)
+			else
+				@users.push(account)
+			end
+		end
+
+		slim :users
 	end
 end

@@ -17,9 +17,7 @@ div.threads
                         | #{thread[3]}
                     |, #{DateTime.parse(thread[6]).strftime("%F")}
             -for post in @latest_posts.reverse
-                / -p post[0]
                 -if post[0] == thread[0]
-                    -p "haha"
                     div.thread-stats
                         div.picture
                             a href="/profile/#{post[3]}"
@@ -29,7 +27,6 @@ div.threads
                             p #{DateTime.parse(post[2]).strftime("%F")}
                 -elsif post[0] == false
                     -if post[1] == thread[0]
-                        -p "lol"
                         div.thread-stats
                             div.picture
                                 a href="/profile/#{thread[3]}"
