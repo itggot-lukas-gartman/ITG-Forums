@@ -31,6 +31,8 @@ class App < Sinatra::Base
 	get '/denied' do
 		status 403
 		@title = "ITG Forums | Denied"
+		@denied = session[:denied]
+		session[:denied] = ""
 		slim :'utils/denied'
 	end
 
@@ -133,6 +135,7 @@ class App < Sinatra::Base
 			@email = db.execute("SELECT email FROM accounts WHERE username = ?", session[:username]).first.first
 			slim :settings
 		else
+			session[:denied] = "You are not logged in."
 			redirect '/denied'
 		end
 	end
@@ -144,6 +147,7 @@ class App < Sinatra::Base
 			flash[:success] = "Email updated"
 			redirect back
 		else
+			session[:denied] = "You are not logged in."
 			redirect '/denied'
 		end
 	end
@@ -173,17 +177,47 @@ class App < Sinatra::Base
 				redirect back
 			end
 		else
+			session[:denied] = "You are not logged in."
 			redirect '/denied'
 		end
 	end
 
 
+	get '/subforum/:id/new' do
+		id = params['id']
+		forum = db.execute("SELECT forum FROM subforums WHERE id = ?", id).first.first
+		permission = db.execute("SELECT permission FROM forums WHERE id = ?", forum).first.first
+
+		if $admin
+			unless permission <= 3
+				session[:denied] = "You don't have permission to create a new thread in this subforum."
+				redirect '/denied'
+			end
+			slim :new_thread
+		elsif $mod
+			unless permission <= 2
+				session[:denied] = "You don't have permission to create a new thread in this subforum."
+				redirect '/denied'
+			end
+			slim :new_thread
+		elsif $user
+			unless permission <= 1
+				session[:denied] = "You don't have permission to create a new thread in this subforum."
+				redirect '/denied'
+			end
+			slim :new_thread
+		else
+			flash[:error] = "You must be logged in to create a new thread."
+			redirect back
+		end
+	end
+
 	get '/subforum/:id' do
 		id = params['id']
 
 		begin
-			@subforum = db.execute("SELECT name FROM subforums WHERE id = ?", id).first.first
-			@title = "ITG Forums | #{@subforum}"
+			@subforum = db.execute("SELECT id, name FROM subforums WHERE id = ?", id).first
+			@title = "ITG Forums | #{@subforum[1]}"
 		rescue
 			session[:url] = request.fullpath
 			redirect '/not_found'

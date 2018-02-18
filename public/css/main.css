@@ -54,7 +54,7 @@
 }
 
 /* utils */
-.not-found {
+.not-found, .denied {
 	/* text-align: center; */
 	max-width: 500px;
 	align-self: center;
@@ -106,6 +106,7 @@ header {
 	display: flex;
 	flex-direction: row;
 	align-items: center;
+	justify-content: flex-end;
 }
 
 .logo {
@@ -124,14 +125,13 @@ header {
 }
 
 .button {
-	/* display: flex; */
 	display: inline-block;
 	padding: 5px 10px;
 	color: white;
 	background-color: #304d66;
 	text-decoration: none;
 	border-radius: 2px;
-	/* text-align: center; */
+	text-align: center;
 	align-self: center;
 	margin-left: 10px;
 }
@@ -256,7 +256,9 @@ main {
 .subforum-info, .thread-info {
 	display: flex;
 	flex-direction: column;
-	width: auto;
+	width: 75%;
+	/* max-width: 55%; */
+	margin-right: 5px;
 }
 
 .subforum-info > a, .subforum-last_thread > a, .thread-info > a, .thread-stats > .last-post > a {
@@ -271,12 +273,12 @@ main {
 .subforum-last_thread {
 	display: flex;
 	flex-direction: column;
-	justify-content: center;
+	/* justify-content: center; */
 	width: 25%;
 	min-width: 120px;
 }
 
-.subforum-last_thread > a {
+.subforum-last_thread > a, .thread-info > a {
 	text-overflow: ellipsis;
 	overflow: hidden;
 	white-space: nowrap;
@@ -323,7 +325,7 @@ main {
 }
 
 .last-post > p {
-	margin: 5px 0 0 0;
+	margin: 5px 0;
 }
 
 .picture {
@@ -425,6 +427,13 @@ form[action="settings/password"] > input[type="text"], form[action="settings/pas
 }
 
 
+@media screen and (min-width: calc(1300px + 20vw)) {
+	.login-form {
+		/* right: 250px; */
+		right: 20%;
+	}
+}
+
 @media screen and (max-width: 1000px) {
 	main {
 		width: 95vw;
@@ -441,9 +450,63 @@ form[action="settings/password"] > input[type="text"], form[action="settings/pas
 	}
 }
 
-@media screen and (min-width: calc(1300px + 20vw)) {
-	.login-form {
-		/* right: 250px; */
-		right: 20%;
+@media screen and (max-width: 465px) {
+	.logo {
+		font-size: 1.5em;
+	}
+
+	.subforum-info, .thread-info {
+		width: 60%;
+	}
+
+	.subforum-last_thread, .last-post {
+		width: 40%;
+	}
+}
+
+@media screen and (max-width: 420px) {
+	.logo {
+		font-size: 1.3em;
+		margin: 0;
+	}
+
+	.user-container {
+		width: 60%;
+	}
+
+	.user-container > .link, .user-container > .button {
+		font-size: .85em;
+	}
+
+	/* .user-container > .link {
+		width: 90px;
+	} */
+
+	.user-container > .button {
+		width: 67px;
+	}
+
+	main {
+		width: 100vw;
+	}
+
+	.categories, .threads {
+		margin: 0;
+	}
+
+	.thread-stats {
+		width: 40%;
+	}
+
+	.threads * a, .threads * p, .divider {
+		font-size: 1em !important;
+	}
+
+	.threads * span, .last-post > p {
+		font-size: 0.9em !important;
+	}
+
+	.picture {
+		display: none;
 	}
 }

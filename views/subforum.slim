@@ -1,7 +1,8 @@
+==display :'utils/flash'
 div.threads
     div.subforum-tools
-        h2 #{@subforum}
-        a.button href="./new" New thread
+        h2 #{@subforum[1]}
+        a.button href="./#{@subforum[0]}/new" New thread
     div.divider
         -if @threads.length == 0
             | This subforum is empty

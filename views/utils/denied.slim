@@ -1,2 +1,6 @@
-h1 You reached this page because you probably did something you're not supposed to.
-h2 GTFO min egen.
+div.denied
+    h2 403 Forbidden.
+    -if @denied == ""
+        p Access denied. If you believe this is an error, please contact an administrator.
+    -else
+        p #{@denied} If you believe this is an error, please contact an administrator.
