@@ -1,5 +1,34 @@
-h2 #{@thread[1]}
-p #{@thread[2]}
--if !@posts.nil?
-    -for post in @posts
-        p #{post[2]}
+div.thread
+    h2 #{@thread[1]}
+    div.divider
+        -if @posts.count == 0
+            | There are no replies
+        -elsif @posts.count == 1
+            | There is one reply
+        -else
+            | There are #{@posts.count} replies
+
+    div.post
+        div.post-owner
+            a href="/profile/#{@thread_owner[1]}" #{@thread_owner[1]}
+            img.profile-picture src="#{@thread_owner[5]}"
+            p #{@thread_owner[-1]} posts
+            p #{@thread_owner[8]} rep
+        div.post-content
+            p.post-date Posted #{@thread[6]}
+            p #{@thread[2]}
+
+    -@posts.each_with_index do |post, i|
+        div.post
+            div.post-owner
+                a href="#{post[3]}" #{post[3]}
+                img.profile-picture src="#{@post_owners[i][5]}"
+                p #{@post_owners[i][-1]} posts
+                p #{@post_owners[i][8]} rep
+            div.post-content
+                p.post-date Posted #{post[5]}
+                p #{post[2]}
+
+    form action="./reply" method="POST"
+        textarea name="message" placeholder="Reply to this thread..."
+        input type="submit" value="Submit reply" 

@@ -225,7 +225,7 @@ main {
 	
 }
 
-.categories {
+.categories, .threads, .thread {
 	margin: 10px;
 }
 
@@ -289,10 +289,12 @@ main {
 	font-size: 0.9em;
 }
 
+
 /* subforum view */
-.threads {
+
+/* .threads {
 	margin: 10px;
-}
+} */
 
 .subforum-tools {
 	display: flex;
@@ -338,12 +340,58 @@ main {
 }
 
 
+/* Thread view */
+.post {
+	display: flex;
+	flex-direction: row;
+	/* justify-content: space-between; */
+	padding: 20px 0;
+}
+
+.post-owner {
+	display: flex;
+	flex-direction: column;
+	margin-right: 20px;
+	justify-content: center;
+	align-items: center;
+	width: 120px;
+}
+
+.post-owner > a {
+	font-size: 1.5em;
+	text-decoration: none;
+}
+
+.post-owner > .profile-picture {
+	width: 75px;
+	margin: 10px 0;
+}
+
+.post-owner > p {
+	margin: 5px 0;
+}
+
+.post-content {
+	display: flex;
+	flex-direction: column;
+	/* width: 80%; */
+}
+
+.thread > form[action="./reply"] > textarea {
+	width: calc(100% - 20px);
+	margin-top: 20px;
+}
+
+.thread > form[action="./reply"] > input[type="submit"] {
+	float: right;
+}
+
 /* Register account */
 .register {
 	margin: 15px 30px;
 }
 
-input[type="text"], input[type="email"], input[type="password"] {
+input[type="text"], input[type="email"], input[type="password"], textarea {
 	border: solid;
 	border-width: 1px;
     border-radius: 3px;
@@ -352,7 +400,7 @@ input[type="text"], input[type="email"], input[type="password"] {
     resize: none;
 }
 
-input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus {
+input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, textarea:focus {
 	box-shadow: 0 0 5px rgb(81, 203, 238);
 }
 

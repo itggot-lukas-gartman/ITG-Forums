@@ -245,9 +245,30 @@ class App < Sinatra::Base
 
 	get '/thread/:id' do
 		id = params['id']
-		@thread = db.execute("SELECT * FROM threads WHERE id = ?", id).first
-		@title = "ITG Forums | #{@thread[1]}"
-		@posts = db.execute("SELECT * FROM posts WHERE thread = ?", id)
+		begin
+			@thread = db.execute("SELECT * FROM threads WHERE id = ?", id).first
+			@title = "ITG Forums | #{@thread[1]}"
+			@posts = db.execute("SELECT * FROM posts WHERE thread = ?", id)
+			
+			@thread_owner = db.execute("SELECT * FROM accounts WHERE username = ?", @thread[3]).first
+			thread_count = db.execute("SELECT COUNT(owner) FROM threads WHERE owner = ?", @thread_owner[1]).first.first
+			post_count = db.execute("SELECT COUNT(owner) FROM posts WHERE owner = ?", @thread_owner[1]).first.first
+			total_post_count = thread_count + post_count
+			@thread_owner.push(total_post_count)
+
+			@post_owners = []
+			for post in @posts
+				owner = db.execute("SELECT * FROM accounts WHERE username = ?", post[3]).first
+				thread_count = db.execute("SELECT COUNT(owner) FROM threads WHERE owner = ?", post[3]).first.first
+				post_count = db.execute("SELECT COUNT(owner) FROM posts WHERE owner = ?", post[3]).first.first
+				total_post_count = thread_count + post_count
+				owner.push(total_post_count)
+				@post_owners.push(owner)
+			end
+		rescue
+			session[:url] = request.fullpath
+			redirect '/not_found'
+		end
 		slim :thread
 	end
 
