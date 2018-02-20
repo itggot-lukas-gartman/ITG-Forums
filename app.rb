@@ -128,7 +128,7 @@ class App < Sinatra::Base
 	end
 	
 	
-	
+	# Account settings
 	get '/settings' do
 		if session[:username]
 			# @username = session[:username]
@@ -182,7 +182,7 @@ class App < Sinatra::Base
 		end
 	end
 
-
+	
 	get '/subforum/:id/new' do
 		id = params['id']
 		forum = db.execute("SELECT forum FROM subforums WHERE id = ?", id).first.first
@@ -214,62 +214,122 @@ class App < Sinatra::Base
 
 	get '/subforum/:id' do
 		id = params['id']
-
-		begin
-			@subforum = db.execute("SELECT id, name FROM subforums WHERE id = ?", id).first
-			@title = "ITG Forums | #{@subforum[1]}"
-		rescue
-			session[:url] = request.fullpath
-			redirect '/not_found'
+		user_rank = db.execute("SELECT rank FROM accounts WHERE username = ?", session[:username]).first
+		if user_rank.nil?
+			user_rank = 0
+		else
+			user_rank = user_rank.first
 		end
 
-		@threads = db.execute("SELECT * FROM threads WHERE subforum = ?", id)
-		@latest_posts = []
-		for thread in @threads
-			post = db.execute("SELECT thread, owner, date FROM posts WHERE thread = ?", thread[0]).last
-
-			if post.nil?
-				profile_picture = db.execute("SELECT picture FROM accounts WHERE username = ?", thread[3]).first.first
-				post = [false, thread[0]]
-				post.push(profile_picture)
-				@latest_posts.push(post)
-			else
-				profile_picture = db.execute("SELECT picture FROM accounts WHERE username = ?", post[1]).first.first
-				post.push(profile_picture)
-				@latest_posts.push(post)
+		forum_id = db.execute("SELECT forum FROM subforums WHERE id = ?", id).first.first
+		forum_permission = db.execute("SELECT permission FROM forums WHERE id = ?", forum_id).first.first
+		if user_rank >= forum_permission
+			begin
+				@subforum = db.execute("SELECT id, name FROM subforums WHERE id = ?", id).first
+				@title = "ITG Forums | #{@subforum[1]}"
+			rescue
+				session[:url] = request.fullpath
+				redirect '/not_found'
 			end
-		end
 
-		slim :subforum
+			@threads = db.execute("SELECT * FROM threads WHERE subforum = ?", id)
+			@latest_posts = []
+			for thread in @threads
+				post = db.execute("SELECT thread, owner, date FROM posts WHERE thread = ?", thread[0]).last
+
+				if post.nil?
+					profile_picture = db.execute("SELECT picture FROM accounts WHERE username = ?", thread[3]).first.first
+					post = [false, thread[0]]
+					post.push(profile_picture)
+					@latest_posts.push(post)
+				else
+					profile_picture = db.execute("SELECT picture FROM accounts WHERE username = ?", post[1]).first.first
+					post.push(profile_picture)
+					@latest_posts.push(post)
+				end
+			end
+			slim :subforum
+		else
+			session[:denied] = "You don't have permission to view this forum."
+			redirect '/denied'
+		end
 	end
 
 	get '/thread/:id' do
 		id = params['id']
-		begin
-			@thread = db.execute("SELECT * FROM threads WHERE id = ?", id).first
-			@title = "ITG Forums | #{@thread[1]}"
-			@posts = db.execute("SELECT * FROM posts WHERE thread = ?", id)
-			
-			@thread_owner = db.execute("SELECT * FROM accounts WHERE username = ?", @thread[3]).first
-			thread_count = db.execute("SELECT COUNT(owner) FROM threads WHERE owner = ?", @thread_owner[1]).first.first
-			post_count = db.execute("SELECT COUNT(owner) FROM posts WHERE owner = ?", @thread_owner[1]).first.first
-			total_post_count = thread_count + post_count
-			@thread_owner.push(total_post_count)
-
-			@post_owners = []
-			for post in @posts
-				owner = db.execute("SELECT * FROM accounts WHERE username = ?", post[3]).first
-				thread_count = db.execute("SELECT COUNT(owner) FROM threads WHERE owner = ?", post[3]).first.first
-				post_count = db.execute("SELECT COUNT(owner) FROM posts WHERE owner = ?", post[3]).first.first
-				total_post_count = thread_count + post_count
-				owner.push(total_post_count)
-				@post_owners.push(owner)
-			end
-		rescue
-			session[:url] = request.fullpath
-			redirect '/not_found'
+		user_rank = db.execute("SELECT rank FROM accounts WHERE username = ?", session[:username]).first
+		if user_rank.nil?
+			user_rank = 0
+		else
+			user_rank = user_rank.first
 		end
-		slim :thread
+
+		subforum_id = db.execute("SELECT subforum FROM threads WHERE id = ?", id).first.first
+		forum_id = db.execute("SELECT forum FROM subforums WHERE id = ?", subforum_id).first.first
+		forum_permission = db.execute("SELECT permission FROM forums WHERE id = ?", forum_id).first.first
+
+		if user_rank >= forum_permission
+			begin
+				@thread = db.execute("SELECT * FROM threads WHERE id = ?", id).first
+				@title = "ITG Forums | #{@thread[1]}"
+				@posts = db.execute("SELECT * FROM posts WHERE thread = ?", id)
+				
+				@thread_owner = db.execute("SELECT * FROM accounts WHERE username = ?", @thread[3]).first
+				thread_count = db.execute("SELECT COUNT(owner) FROM threads WHERE owner = ?", @thread_owner[1]).first.first
+				post_count = db.execute("SELECT COUNT(owner) FROM posts WHERE owner = ?", @thread_owner[1]).first.first
+				total_post_count = thread_count + post_count
+				@thread_owner.push(total_post_count)
+
+				@post_owners = []
+				for post in @posts
+					owner = db.execute("SELECT * FROM accounts WHERE username = ?", post[3]).first
+					thread_count = db.execute("SELECT COUNT(owner) FROM threads WHERE owner = ?", post[3]).first.first
+					post_count = db.execute("SELECT COUNT(owner) FROM posts WHERE owner = ?", post[3]).first.first
+					total_post_count = thread_count + post_count
+					owner.push(total_post_count)
+					@post_owners.push(owner)
+				end
+			rescue
+				session[:url] = request.fullpath
+				redirect '/not_found'
+			end
+			slim :thread
+		else
+			session[:denied] = "You don't have permission to view this forum."
+			redirect '/denied'
+		end
+	end
+
+	post '/thread/reply' do
+		if session[:username]
+			id = params['id'].to_i
+			user_rank = db.execute("SELECT rank FROM accounts WHERE username = ?", session[:username]).first.first
+			subforum_id = db.execute("SELECT subforum FROM threads WHERE id = ?", id).first.first
+			forum_id = db.execute("SELECT forum FROM subforums WHERE id = ?", subforum_id).first.first
+			forum_permission = db.execute("SELECT permission FROM forums WHERE id = ?", forum_id).first.first
+			if user_rank >= forum_permission
+				begin
+					message = params['message']
+					if message.length < 10
+						flash[:error] = "Message is too short. Please do not post unnecessary spam messages that does not contribute to anything."
+						redirect back
+					else
+						db.execute("INSERT INTO posts (thread, text, owner) VALUES (?, ?, ?)", id, message, session[:username])
+						flash[:success] = "Posted successfully!"
+						redirect back
+					end
+				rescue
+					session[:url] = request.fullpath
+					redirect '/not_found'
+				end
+			else
+				session[:denied] = "You don't have permission to post in this forum."
+				redirect '/denied'
+			end
+		else
+			session[:denied] = "You must login before making a post."
+			redirect '/denied'
+		end
 	end
 
 	get '/activity' do

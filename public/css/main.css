@@ -219,7 +219,7 @@ main {
 	width: 80vw;
 	/* max-width: 100%; */
 	max-width: 1300px;
-	margin-top: -70px;
+	margin: -70px 0 20px 0;
 	/* padding: 0 10px; */
 	transition: all 0.1s;
 	
@@ -227,6 +227,7 @@ main {
 
 .categories, .threads, .thread {
 	margin: 10px;
+	/* padding-bottom: 20px; */
 }
 
 .divider {
@@ -377,12 +378,12 @@ main {
 	/* width: 80%; */
 }
 
-.thread > form[action="./reply"] > textarea {
+.thread > form[action="/thread/reply"] > textarea {
 	width: calc(100% - 20px);
 	margin-top: 20px;
 }
 
-.thread > form[action="./reply"] > input[type="submit"] {
+.thread > form[action="/thread/reply"] > input[type="submit"] {
 	float: right;
 }
 

@@ -1,3 +1,4 @@
+==display :'utils/flash'
 div.thread
     h2 #{@thread[1]}
     div.divider
@@ -29,6 +30,7 @@ div.thread
                 p.post-date Posted #{post[5]}
                 p #{post[2]}
 
-    form action="./reply" method="POST"
+    form action="/thread/reply" method="POST"
+        input name="id" type="hidden" value="#{@thread[0]}"
         textarea name="message" placeholder="Reply to this thread..."
         input type="submit" value="Submit reply" 
