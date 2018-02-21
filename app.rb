@@ -182,6 +182,17 @@ class App < Sinatra::Base
 		end
 	end
 
+	# Account profile
+	get '/profile/:username' do
+		username = params[:username]
+		begin
+			@account = db.execute("SELECT * FROM accounts WHERE username = ?", username).first
+		rescue
+			session[:url] = request.fullpath
+			redirect '/not_found'
+		end
+	end
+
 	
 	get '/subforum/:id/new' do
 		id = params['id']
@@ -255,8 +266,9 @@ class App < Sinatra::Base
 		end
 	end
 
-	get '/thread/:id' do
+	get '/subforum/:id/new' do
 		id = params['id']
+
 		user_rank = db.execute("SELECT rank FROM accounts WHERE username = ?", session[:username]).first
 		if user_rank.nil?
 			user_rank = 0
@@ -264,12 +276,36 @@ class App < Sinatra::Base
 			user_rank = user_rank.first
 		end
 
-		subforum_id = db.execute("SELECT subforum FROM threads WHERE id = ?", id).first.first
-		forum_id = db.execute("SELECT forum FROM subforums WHERE id = ?", subforum_id).first.first
+		forum_id = db.execute("SELECT forum FROM subforums WHERE id = ?", id).first.first
 		forum_permission = db.execute("SELECT permission FROM forums WHERE id = ?", forum_id).first.first
-
 		if user_rank >= forum_permission
 			begin
+
+			rescue
+
+			end
+		else
+			session[:denied] = "You don't have permission to view this forum."
+			redirect '/denied'
+		end
+	end
+
+	get '/thread/:id' do
+		id = params['id']
+
+		user_rank = db.execute("SELECT rank FROM accounts WHERE username = ?", session[:username]).first
+		if user_rank.nil?
+			user_rank = 0
+		else
+			user_rank = user_rank.first
+		end
+
+		begin
+			subforum_id = db.execute("SELECT subforum FROM threads WHERE id = ?", id).first.first
+			forum_id = db.execute("SELECT forum FROM subforums WHERE id = ?", subforum_id).first.first
+			forum_permission = db.execute("SELECT permission FROM forums WHERE id = ?", forum_id).first.first
+
+			if user_rank >= forum_permission
 				@thread = db.execute("SELECT * FROM threads WHERE id = ?", id).first
 				@title = "ITG Forums | #{@thread[1]}"
 				@posts = db.execute("SELECT * FROM posts WHERE thread = ?", id)
@@ -289,42 +325,45 @@ class App < Sinatra::Base
 					owner.push(total_post_count)
 					@post_owners.push(owner)
 				end
-			rescue
-				session[:url] = request.fullpath
-				redirect '/not_found'
+				slim :thread
+			else
+				session[:denied] = "You don't have permission to view this forum."
+				redirect '/denied'
 			end
-			slim :thread
-		else
-			session[:denied] = "You don't have permission to view this forum."
-			redirect '/denied'
+		rescue
+			session[:url] = request.fullpath
+			redirect '/not_found'
 		end
 	end
 
 	post '/thread/reply' do
 		if session[:username]
-			id = params['id'].to_i
-			user_rank = db.execute("SELECT rank FROM accounts WHERE username = ?", session[:username]).first.first
-			subforum_id = db.execute("SELECT subforum FROM threads WHERE id = ?", id).first.first
-			forum_id = db.execute("SELECT forum FROM subforums WHERE id = ?", subforum_id).first.first
-			forum_permission = db.execute("SELECT permission FROM forums WHERE id = ?", forum_id).first.first
-			if user_rank >= forum_permission
-				begin
-					message = params['message']
+			id = params['id']
+			message = params['message']
+			session[:reply_msg] = message
+
+			begin
+				user_rank = db.execute("SELECT rank FROM accounts WHERE username = ?", session[:username]).first.first
+				subforum_id = db.execute("SELECT subforum FROM threads WHERE id = ?", id).first.first
+				forum_id = db.execute("SELECT forum FROM subforums WHERE id = ?", subforum_id).first.first
+				forum_permission = db.execute("SELECT permission FROM forums WHERE id = ?", forum_id).first.first
+				if user_rank >= forum_permission
 					if message.length < 10
 						flash[:error] = "Message is too short. Please do not post unnecessary spam messages that does not contribute to anything."
 						redirect back
 					else
 						db.execute("INSERT INTO posts (thread, text, owner) VALUES (?, ?, ?)", id, message, session[:username])
 						flash[:success] = "Posted successfully!"
+						session.delete(:reply_msg)
 						redirect back
 					end
-				rescue
-					session[:url] = request.fullpath
-					redirect '/not_found'
+				else
+					session[:denied] = "You don't have permission to post in this forum."
+					redirect '/denied'
 				end
-			else
-				session[:denied] = "You don't have permission to post in this forum."
-				redirect '/denied'
+			rescue
+				# session[:url] = request.fullpath
+				redirect '/not_found'
 			end
 		else
 			session[:denied] = "You must login before making a post."

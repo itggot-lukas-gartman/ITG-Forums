@@ -16,8 +16,8 @@ div.thread
             p #{@thread_owner[-1]} posts
             p #{@thread_owner[8]} rep
         div.post-content
-            p.post-date Posted #{@thread[6]}
             p #{@thread[2]}
+            i.post-date Posted #{@thread[6]}
 
     -@posts.each_with_index do |post, i|
         div.post
@@ -27,10 +27,16 @@ div.thread
                 p #{@post_owners[i][-1]} posts
                 p #{@post_owners[i][8]} rep
             div.post-content
-                p.post-date Posted #{post[5]}
                 p #{post[2]}
+                i.post-date Posted #{post[5]}
 
-    form action="/thread/reply" method="POST"
-        input name="id" type="hidden" value="#{@thread[0]}"
-        textarea name="message" placeholder="Reply to this thread..."
-        input type="submit" value="Submit reply" 
+    -if session[:username]
+        form action="/thread/reply" method="POST"
+            input name="id" type="hidden" value="#{@thread[0]}"
+            -p session[:reply_msg]
+            -if session[:reply_msg].nil?
+                textarea name="message" placeholder="Reply to this thread..."
+            -else
+                textarea name="message" placeholder="Reply to this thread..." #{session[:reply_msg]}
+                -session.delete(:reply_msg)
+            input type="submit" value="Submit reply"

@@ -1,8 +1,9 @@
 div.not-found
-    -if @url == ""
+    -if @url.nil? || @url == ""
         h2 404 Not Found.
         p Sorry, the page you were trying to reach could not be found. If you believe this is an error, please contact an administrator.
     -else
+        h2 404 Not Found.
         p
             | Sorry, 
             strong #{@url} 

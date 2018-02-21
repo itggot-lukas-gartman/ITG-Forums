@@ -353,7 +353,7 @@ main {
 	display: flex;
 	flex-direction: column;
 	margin-right: 20px;
-	justify-content: center;
+	/* justify-content: center; */
 	align-items: center;
 	width: 120px;
 }
@@ -375,7 +375,13 @@ main {
 .post-content {
 	display: flex;
 	flex-direction: column;
-	/* width: 80%; */
+	justify-content: space-around;
+	width: calc(100% - 140px);
+}
+
+.post-content > p {
+	margin-top: 0;
+	word-wrap: break-word;
 }
 
 .thread > form[action="/thread/reply"] > textarea {
