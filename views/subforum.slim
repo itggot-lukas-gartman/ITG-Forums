@@ -1,38 +1,37 @@
 ==display :'utils/flash'
-div.threads
-    div.subforum-tools
-        h2 #{@subforum[1]}
-        -if @user
-            a.button href="./#{@subforum[0]}/new" New thread
-    div.divider
-        -if @threads.length == 0
-            | This subforum is empty
-        -else
-            | There are #{@threads.length} threads in this subforum
-    -for thread in @threads.reverse
-        div.thread-container
-            div.thread-info
-                a href="/thread/#{thread[0]}" #{thread[1]}
-                span
-                    | By 
-                    a href="/profile/#{thread[3]}"
-                        | #{thread[3]}
-                    |, #{DateTime.parse(thread[6]).strftime("%F")}
-            -for post in @latest_posts.reverse
-                -if post[0] == thread[0]
+div.subforum-tools
+    h2 #{@subforum[1]}
+    -if @user
+        a.button href="./#{@subforum[0]}/new" New thread
+div.divider
+    -if @threads.length == 0
+        | This subforum is empty
+    -else
+        | There are #{@threads.length} threads in this subforum
+-for thread in @threads.reverse
+    div.thread-container
+        div.thread-info
+            a href="/thread/#{thread[0]}" #{thread[1]}
+            span
+                | By 
+                a href="/profile/#{thread[3]}"
+                    | #{thread[3]}
+                |, #{DateTime.parse(thread[6]).strftime("%F")}
+        -for post in @latest_posts.reverse
+            -if post[0] == thread[0]
+                div.thread-stats
+                    div.picture
+                        a href="/profile/#{post[3]}"
+                            img.profile-picture src="#{post[3]}"
+                    div.last-post
+                        a href="/profile/#{post[1]}" #{post[1]}
+                        span #{DateTime.parse(post[2]).strftime("%F")}
+            -elsif post[0] == false
+                -if post[1] == thread[0]
                     div.thread-stats
                         div.picture
-                            a href="/profile/#{post[3]}"
-                                img.profile-picture src="#{post[3]}"
+                            a href="/profile/#{thread[3]}"
+                                img.profile-picture src="#{post[2]}"
                         div.last-post
-                            a href="/profile/#{post[1]}" #{post[1]}
-                            p #{DateTime.parse(post[2]).strftime("%F")}
-                -elsif post[0] == false
-                    -if post[1] == thread[0]
-                        div.thread-stats
-                            div.picture
-                                a href="/profile/#{thread[3]}"
-                                    img.profile-picture src="#{post[2]}"
-                            div.last-post
-                                a href="/profile/#{thread[3]}" #{thread[3]}
-                                p #{DateTime.parse(thread[6]).strftime("%F")}
+                            a href="/profile/#{thread[3]}" #{thread[3]}
+                            span #{DateTime.parse(thread[6]).strftime("%F")}

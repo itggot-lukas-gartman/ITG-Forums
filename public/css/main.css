@@ -49,8 +49,7 @@
 /* utils */
 .not-found, .denied {
 	max-width: 500px;
-	align-self: center;
-	margin: 0 20px;
+	margin: auto;
 }
 
 /* main */
@@ -173,6 +172,15 @@ header {
 	text-decoration: none;
 }
 
+main {
+	display: flex;
+	flex-direction: column;
+	background-color: white;
+	width: 80vw;
+	max-width: 1300px;
+	margin: -70px 0 20px 0;
+	transition: all 0.1s;
+}
 
 nav {
 	display: flex;
@@ -194,18 +202,7 @@ nav {
 	border-bottom: 2px solid white;
 }
 
-main {
-	display: flex;
-	flex-direction: column;
-	background-color: white;
-	width: 80vw;
-	max-width: 1300px;
-	margin: -70px 0 20px 0;
-	transition: all 0.1s;
-	
-}
-
-.categories, .threads, .thread {
+.content {
 	margin: 10px;
 }
 
@@ -247,7 +244,7 @@ main {
 	margin: 5px 0;
 }
 
-.subforum-last_thread {
+.subforum-last_thread, .last-post {
 	display: flex;
 	flex-direction: column;
 	width: 25%;
@@ -297,10 +294,6 @@ main {
 	min-width: 120px;
 }
 
-.last-post > p {
-	margin: 5px 0;
-}
-
 .picture {
 	width: 50px;
 	align-self: center;
@@ -308,6 +301,7 @@ main {
 
 .picture > a > .profile-picture {
 	width: 40px;
+	margin-top: 10px;
 }
 
 
@@ -352,18 +346,18 @@ main {
 	word-wrap: break-word;
 }
 
-.thread > form[action="/thread/reply"] > textarea {
+form[action="/thread/reply"] > textarea {
 	width: calc(100% - 20px);
 	margin-top: 20px;
 }
 
-.thread > form[action="/thread/reply"] > input[type="submit"] {
+form[action="/thread/reply"] > input[type="submit"] {
 	float: right;
 }
 
 /* Register account */
 .register {
-	margin: 15px 30px;
+	margin: 10px 20px;
 }
 
 input[type="text"], input[type="email"], input[type="password"], textarea {
@@ -400,7 +394,6 @@ input[type="submit"]:hover {
 .settings {
 	display: flex;
 	flex-direction: column;
-	margin: 0 0 10px 10px;
 }
 
 form[action="settings/password"] > input[type="text"], form[action="settings/password"] > input[type="password"] {
@@ -409,9 +402,9 @@ form[action="settings/password"] > input[type="text"], form[action="settings/pas
 
 
 /* Users */
-.users {
+/* .users {
 	margin: 10px;
-}
+} */
 
 .user-group {
 	display: flex;
@@ -497,19 +490,25 @@ form[action="settings/password"] > input[type="text"], form[action="settings/pas
 		width: 100vw;
 	}
 
-	.categories, .threads {
+	.content {
 		margin: 0;
+	}
+
+	.not-found, .denied {
+		margin: 10px;
 	}
 
 	.thread-stats {
 		width: 40%;
 	}
 
-	.threads * a, .threads * p, .divider {
+
+	/* NEEDS ATTENTION */
+	.content * a, .content * p, .divider {
 		font-size: 1em !important;
 	}
 
-	.threads * span, .last-post > p {
+	.content * span {
 		font-size: 0.9em !important;
 	}
 

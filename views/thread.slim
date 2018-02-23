@@ -3,11 +3,11 @@ div.thread
     h2 #{@thread[1]}
     div.divider
         -if @posts.count == 0
-            | There are no replies
+            | There are no replies in this thread
         -elsif @posts.count == 1
-            | There is one reply
+            | There is one reply in this thread
         -else
-            | There are #{@posts.count} replies
+            | There are #{@posts.count} replies in this thread
 
     div.post
         div.post-owner

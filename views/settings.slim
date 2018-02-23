@@ -1,13 +1,12 @@
 ==display :'utils/flash'
-div.settings
-	h2 Update email
-	form action="/settings/email" method="POST"
-		input type="email" name="email" placeholder="Email" value="#{@email}"
-		input type="submit" value="Update email"
+h2 Update email
+form action="/settings/email" method="POST"
+	input type="email" name="email" placeholder="Email" value="#{@email}"
+	input type="submit" value="Update email"
 
-	h2 Update password
-	form action="/settings/password" method="POST"
-		input type="password" name="old_password" placeholder="Old password"
-		input type="password" name="new_password" placeholder="New password"
-		input type="password" name="repeat_password" placeholder="Repeat password"
-		input type="submit" value="Update password"
+h2 Update password
+form action="/settings/password" method="POST"
+	input type="password" name="old_password" placeholder="Old password"
+	input type="password" name="new_password" placeholder="New password"
+	input type="password" name="repeat_password" placeholder="Repeat password"
+	input type="submit" value="Update password"
