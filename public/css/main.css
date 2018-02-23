@@ -1,8 +1,3 @@
-/* @font-face { */
-    /* font-family: "Roboto"; */
-    /* src: url("../fonts/Roboto-Regular.ttf"); */
-/* } */
-
 .hidden {
 	display: none !important;
 }
@@ -21,7 +16,6 @@
 
 .alert-success {
 	background-color: rgba(121, 190, 37, 0.9);
-	/* color: rgba(121, 190, 37, 0.9); */
 }
 
 .alert-error {
@@ -45,7 +39,6 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	/* align-self: center; */
 	width: 40vw;
 	height: 20vh;
 	border-radius: 10px;
@@ -55,7 +48,6 @@
 
 /* utils */
 .not-found, .denied {
-	/* text-align: center; */
 	max-width: 500px;
 	align-self: center;
 	margin: 0 20px;
@@ -69,18 +61,12 @@ body {
 	margin: 0;
 	background-color: #f0f0f0;
 	font-family: Roboto;
-	/* width: 100vw; */
-	/* height: 100vh; */
 }
 
 header {
 	display: flex;
-	/* flex-direction: column; */
-	/* align-items: center; */
-	/* justify-content: center; */
 	width: 100vw;
 	max-width: 100%;
-	/* padding: 20px 0; */
 	height: 130px;
 	background-color: #3c6994;
 }
@@ -94,8 +80,6 @@ header {
 	max-width: 1300px;
 	margin: 0 auto;
 	transition: all 0.1s;
-	/* justify-content: center; */
-	/* width: 80vw; */
 }
 
 .logo-container, .user-container {
@@ -147,12 +131,10 @@ header {
 
 .login-form {
 	display: flex;
-	/* flex-direction: column; */
 	position: absolute;
 	top: 50px;
-	right: 15vw;
+	margin-right: 75px;
 	padding: 10px;
-	/* padding-right: 0; */
 	background-color: white;
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 	z-index: 1;
@@ -198,7 +180,6 @@ nav {
 	padding: 5px;
 	height: 30px;
 	align-items: center;
-	/* color: white; */
 }
 
 .navitem {
@@ -217,17 +198,14 @@ main {
 	flex-direction: column;
 	background-color: white;
 	width: 80vw;
-	/* max-width: 100%; */
 	max-width: 1300px;
 	margin: -70px 0 20px 0;
-	/* padding: 0 10px; */
 	transition: all 0.1s;
 	
 }
 
 .categories, .threads, .thread {
 	margin: 10px;
-	/* padding-bottom: 20px; */
 }
 
 .divider {
@@ -247,7 +225,6 @@ main {
 	flex-direction: row;
 	justify-content: space-between;
 	padding: 10px;
-	/* margin-right: 10px; */
 }
 
 .subforum * a {
@@ -258,12 +235,10 @@ main {
 	display: flex;
 	flex-direction: column;
 	width: 75%;
-	/* max-width: 55%; */
 	margin-right: 5px;
 }
 
 .subforum-info > a, .subforum-last_thread > a, .thread-info > a, .thread-stats > .last-post > a {
-	/* display: inline-block; */
 	font-size: 1.2em;
 }
 
@@ -274,7 +249,6 @@ main {
 .subforum-last_thread {
 	display: flex;
 	flex-direction: column;
-	/* justify-content: center; */
 	width: 25%;
 	min-width: 120px;
 }
@@ -292,11 +266,6 @@ main {
 
 
 /* subforum view */
-
-/* .threads {
-	margin: 10px;
-} */
-
 .subforum-tools {
 	display: flex;
 	flex-direction: row;
@@ -345,7 +314,6 @@ main {
 .post {
 	display: flex;
 	flex-direction: row;
-	/* justify-content: space-between; */
 	padding: 20px 0;
 }
 
@@ -353,7 +321,6 @@ main {
 	display: flex;
 	flex-direction: column;
 	margin-right: 20px;
-	/* justify-content: center; */
 	align-items: center;
 	width: 120px;
 }
@@ -421,7 +388,6 @@ input[type="submit"] {
 	border-radius: 3px;
 	text-align: center;
 	margin-top: 10px;
-	/* margin-left: 10px; */
 }
 
 input[type="submit"]:hover {
@@ -462,7 +428,6 @@ form[action="settings/password"] > input[type="text"], form[action="settings/pas
 .user-info > a {
 	text-decoration: none;
 	font-size: 1.2em;
-	/* color: black; */
 }
 
 .user-info > p {
@@ -482,13 +447,6 @@ form[action="settings/password"] > input[type="text"], form[action="settings/pas
 }
 
 
-@media screen and (min-width: calc(1300px + 20vw)) {
-	.login-form {
-		/* right: 250px; */
-		right: 20%;
-	}
-}
-
 @media screen and (max-width: 1000px) {
 	main {
 		width: 95vw;
@@ -500,9 +458,6 @@ form[action="settings/password"] > input[type="text"], form[action="settings/pas
 		transition: all 0.1s;
 	}
 
-	.login-form {
-		right: 12vw;
-	}
 }
 
 @media screen and (max-width: 465px) {
@@ -532,10 +487,6 @@ form[action="settings/password"] > input[type="text"], form[action="settings/pas
 	.user-container > .link, .user-container > .button {
 		font-size: .85em;
 	}
-
-	/* .user-container > .link {
-		width: 90px;
-	} */
 
 	.user-container > .button {
 		width: 67px;
