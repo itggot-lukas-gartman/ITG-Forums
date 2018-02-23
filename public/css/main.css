@@ -346,8 +346,15 @@ nav {
 	word-wrap: break-word;
 }
 
-form[action="/thread/reply"] > textarea {
+form[action="/subforum/new"] > input[type="text"] {
+	width: 200px;
+}
+
+form[action="/thread/reply"] > textarea, form[action="/subforum/new"] > textarea {
 	width: calc(100% - 20px);
+}
+
+form[action="/thread/reply"] > textarea {
 	margin-top: 20px;
 }
 

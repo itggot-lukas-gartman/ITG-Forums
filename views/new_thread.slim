@@ -1,1 +1,9 @@
-div.
+==display :'utils/flash'
+h2 Create a new thread
+form action="/subforum/new" method="POST"
+    input type="hidden" name="id" value="#{@id}"
+    p Title
+    input type="text" name="title" placeholder="Title"
+    p Content
+    textarea name="text" placeholder="Type your text here..."
+    input type="submit" value="Create thread"

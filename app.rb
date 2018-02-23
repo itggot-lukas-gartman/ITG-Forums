@@ -18,9 +18,7 @@ class App < Sinatra::Base
 	before do
 		if session[:username]
 			@user = session[:username]
-			p session[:username]
 			rank = db.execute("SELECT rank FROM accounts WHERE username = ?", session[:username]).first.first
-			p rank
 			if rank == 3
 				@admin = true
 			elsif rank == 2
@@ -213,7 +211,38 @@ class App < Sinatra::Base
 
 	
 	get '/subforum/:id/new' do
+		@id = params['id']
+		forum = db.execute("SELECT forum FROM subforums WHERE id = ?", @id).first.first
+		permission = db.execute("SELECT permission FROM forums WHERE id = ?", forum).first.first
+
+		if @admin
+			unless permission <= 3
+				session[:denied] = "You don't have permission to create a new thread in this subforum."
+				redirect '/denied'
+			end
+		elsif @mod
+			unless permission <= 2
+				session[:denied] = "You don't have permission to create a new thread in this subforum."
+				redirect '/denied'
+			end
+		elsif @user
+			unless permission <= 1
+				session[:denied] = "You don't have permission to create a new thread in this subforum."
+				redirect '/denied'
+			end
+		else
+			session[:denied] = "You must be logged in to create a new thread."
+			redirect '/denied'
+		end
+
+		slim :new_thread
+	end
+
+	post '/subforum/new' do
 		id = params['id']
+		title = params['title']
+		text = params['text']
+
 		forum = db.execute("SELECT forum FROM subforums WHERE id = ?", id).first.first
 		permission = db.execute("SELECT permission FROM forums WHERE id = ?", forum).first.first
 
@@ -222,26 +251,35 @@ class App < Sinatra::Base
 				session[:denied] = "You don't have permission to create a new thread in this subforum."
 				redirect '/denied'
 			end
-
-
-
-			slim :new_thread
 		elsif @mod
 			unless permission <= 2
 				session[:denied] = "You don't have permission to create a new thread in this subforum."
 				redirect '/denied'
 			end
-			slim :new_thread
 		elsif @user
 			unless permission <= 1
 				session[:denied] = "You don't have permission to create a new thread in this subforum."
 				redirect '/denied'
 			end
-			slim :new_thread
 		else
 			session[:denied] = "You must be logged in to create a new thread."
 			redirect '/denied'
 		end
+
+		begin
+			db.execute("INSERT INTO threads (title, text, owner, subforum) VALUES (?, ?, ?, ?)", title, text, session[:username], id)
+			thread_id = db.execute("SELECT last_insert_rowid() FROM threads").first.first
+			flash[:success] = "Thread created successfully!"
+			redirect "/thread/#{thread_id}"
+		rescue => ex
+			open('error_log.log', 'a') do |file|
+				file.puts "[#{Time.now.strftime("%Y-%m-%d %H:%M:%S")}] #{session[:username]}: #{ex.message}"
+			end
+			
+			flash[:error] = "Failed to create thread. If this is a recurring issue, please contact support for assistance."
+			redirect back
+		end
+
 	end
 
 	get '/subforum/:id' do
@@ -281,30 +319,6 @@ class App < Sinatra::Base
 				end
 			end
 			slim :subforum
-		else
-			session[:denied] = "You don't have permission to view this forum."
-			redirect '/denied'
-		end
-	end
-
-	get '/subforum/:id/new' do
-		id = params['id']
-
-		user_rank = db.execute("SELECT rank FROM accounts WHERE username = ?", session[:username]).first
-		if user_rank.nil?
-			user_rank = 0
-		else
-			user_rank = user_rank.first
-		end
-
-		forum_id = db.execute("SELECT forum FROM subforums WHERE id = ?", id).first.first
-		forum_permission = db.execute("SELECT permission FROM forums WHERE id = ?", forum_id).first.first
-		if user_rank >= forum_permission
-			begin
-				
-			rescue
-
-			end
 		else
 			session[:denied] = "You don't have permission to view this forum."
 			redirect '/denied'
