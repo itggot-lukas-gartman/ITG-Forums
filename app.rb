@@ -11,9 +11,27 @@ class App < Sinatra::Base
 	helpers Sinatra::Streaming
 	
 	db = SQLite3::Database.open('db/database.sqlite')
-	$user = false
-	$mod = false
-	$admin = false
+	# $user = false
+	# $mod = false
+	# $admin = false
+
+	before do
+		if session[:username]
+			@user = session[:username]
+			p session[:username]
+			rank = db.execute("SELECT rank FROM accounts WHERE username = ?", session[:username]).first.first
+			p rank
+			if rank == 3
+				@admin = true
+			elsif rank == 2
+				@mod = true
+			end
+		else
+			@user = false
+			@mod = false
+			@admin = false
+		end
+	end
 
 	# not_found do
 	# 	session[:url] = request.fullpath
@@ -81,7 +99,7 @@ class App < Sinatra::Base
 			db.execute("INSERT INTO accounts (username, encrypted_pass, email) VALUES (?, ?, ?)", username, encrypted_pass, email)
 			session[:username] = username
 			session[:profile_picture] = "/uploads/profile-picture/default.svg"
-			$user = session[:username]
+			# @user = session[:username]
 			flash[:success] = "Account registered. Welcome to ITG forums!"
 			redirect '/'
 		end
@@ -98,14 +116,14 @@ class App < Sinatra::Base
 			encrypted_pass = BCrypt::Password.new(credentials[1])
 			if (credentials.first.downcase == username.downcase) && (encrypted_pass == password)
 				session[:username] = username
-				$user = session[:username]
+				# @user = session[:username]
 				session[:profile_picture] = credentials[2]
-				rank = db.execute("SELECT rank FROM accounts WHERE username = ?", username).first.first
-				if rank == 3
-					$admin = true
-				elsif rank == 2
-					$mod = true
-				end
+				# rank = db.execute("SELECT rank FROM accounts WHERE username = ?", username).first.first
+				# if rank == 3
+				# 	@admin = true
+				# elsif rank == 2
+				# 	@mod = true
+				# end
 				redirect back
 			else
 				flash[:error] = "Invalid username or password"
@@ -116,10 +134,10 @@ class App < Sinatra::Base
 	
 	get '/logout' do
 		if session[:username]
-			session.destroy
-			$user = false
-			$mod = false
-			$admin = false
+			session.delete(:username)
+			# @user = false
+			# @mod = false
+			# @admin = false
 			redirect '/'
 		else
 			flash[:error] = "You are not logged in"
@@ -199,19 +217,22 @@ class App < Sinatra::Base
 		forum = db.execute("SELECT forum FROM subforums WHERE id = ?", id).first.first
 		permission = db.execute("SELECT permission FROM forums WHERE id = ?", forum).first.first
 
-		if $admin
+		if @admin
 			unless permission <= 3
 				session[:denied] = "You don't have permission to create a new thread in this subforum."
 				redirect '/denied'
 			end
+
+
+
 			slim :new_thread
-		elsif $mod
+		elsif @mod
 			unless permission <= 2
 				session[:denied] = "You don't have permission to create a new thread in this subforum."
 				redirect '/denied'
 			end
 			slim :new_thread
-		elsif $user
+		elsif @user
 			unless permission <= 1
 				session[:denied] = "You don't have permission to create a new thread in this subforum."
 				redirect '/denied'
@@ -280,7 +301,7 @@ class App < Sinatra::Base
 		forum_permission = db.execute("SELECT permission FROM forums WHERE id = ?", forum_id).first.first
 		if user_rank >= forum_permission
 			begin
-
+				
 			rescue
 
 			end
@@ -350,6 +371,9 @@ class App < Sinatra::Base
 				if user_rank >= forum_permission
 					if message.length < 10
 						flash[:error] = "Message is too short. Please do not post unnecessary spam messages that does not contribute to anything."
+						redirect back
+					elsif message.length > 10000
+						flash[:error] = "Message exceeds 10000 characters."
 						redirect back
 					else
 						db.execute("INSERT INTO posts (thread, text, owner) VALUES (?, ?, ?)", id, message, session[:username])

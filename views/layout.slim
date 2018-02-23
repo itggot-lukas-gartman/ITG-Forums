@@ -15,7 +15,7 @@ html
 				div.logo-container
 					a.logo href="/" ITG Forums
 				div.user-container
-					-unless $user
+					-unless @user
 						div.link onclick="toggleLogin()" Existing user? Sign in
 						img.caret-down src="/img/caret-down.svg" onclick="toggleLogin()"
 						
@@ -25,13 +25,13 @@ html
 								input type="password" name="password" placeholder="Password"
 								input type="submit" value="Login"
 								
-					-if $user
+					-if @user
 						img.profile-picture src="#{session[:profile_picture]}" onclick="toggleProfile()"
-						div.link onclick="toggleProfile()" #{$user}
+						div.link onclick="toggleProfile()" #{@user}
 						img.caret-down src="/img/caret-down.svg" onclick="toggleProfile()"
 					
 						div.user-menu.hidden id="user-menu"
-							a href="/profile/#{$user}" Profile
+							a href="/profile/#{@user}" Profile
 							a href="/settings" Account settings
 							a href="/logout" Logout
 					-else

@@ -2,7 +2,7 @@
 div.categories
 	h2 Forum categories
 	-for forum in @forums
-		-if $admin
+		-if @admin
 			div.category
 				div.divider #{forum[1]}
 				-for subforum in @subforums
@@ -26,7 +26,7 @@ div.categories
 											| #{subforum_thread[-1][3]}
 										|, #{DateTime.parse(subforum_thread[-1][-1]).strftime("%F")}
 
-		-elsif $mod
+		-elsif @mod
 			-if forum[2] <= 2
 				div.category
 					div.divider #{forum[1]}
@@ -51,7 +51,7 @@ div.categories
 												| #{subforum_thread[-1][3]}
 											|, #{DateTime.parse(subforum_thread[-1][-1]).strftime("%F")}
 
-		-elsif $user
+		-elsif @user
 			-if forum[2] <= 1
 				div.category
 					div.divider #{forum[1]}
