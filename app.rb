@@ -239,8 +239,8 @@ class App < Sinatra::Base
 			end
 			slim :new_thread
 		else
-			flash[:error] = "You must be logged in to create a new thread."
-			redirect back
+			session[:denied] = "You must be logged in to create a new thread."
+			redirect '/denied'
 		end
 	end
 
