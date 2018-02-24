@@ -4,18 +4,18 @@ div.register
 	form action="register" method="POST"
 		p Username
 		-if session[:register_username].nil?
-			input type="text" name="username"
+			input[type="text" name="username" required]
 		-else
-			input type="text" name="username" value="#{session[:register_username]}"
+			input[type="text" name="username" required value="#{session[:register_username]}"]
 			-session.delete(:register_username)
 		p Email
 		-if session[:register_email].nil?
-			input type="email" name="email"
+			input[type="email" name="email" required]
 		-else
-			input type="email" name="email" value="#{session[:register_email]}"
+			input[type="email" name="email" required value="#{session[:register_email]}"]
 			-session.delete(:register_email)
 		p Password
-		input type="password" name="password"
+		input[type="password" name="password" required]
 		p Repeat password
-		input type="password" name="password_repeat"
+		input[type="password" name="password_repeat" required]
 		input type="submit" value="Create account"

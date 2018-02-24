@@ -78,7 +78,7 @@ header {
 	width: 80vw;
 	max-width: 1300px;
 	margin: 0 auto;
-	transition: all 0.1s;
+	/* transition: all 0.1s; */
 }
 
 .logo-container, .user-container {
@@ -179,7 +179,7 @@ main {
 	width: 80vw;
 	max-width: 1300px;
 	margin: -70px 0 20px 0;
-	transition: all 0.1s;
+	/* transition: all 0.1s; */
 }
 
 nav {
@@ -451,12 +451,12 @@ form[action="settings/password"] > input[type="text"], form[action="settings/pas
 @media screen and (max-width: 1000px) {
 	main {
 		width: 95vw;
-		transition: all 0.1s;
+		/* transition: all 0.1s; */
 	}
 	
 	.header-container {
 		width: 95vw;
-		transition: all 0.1s;
+		/* transition: all 0.1s; */
 	}
 
 }
