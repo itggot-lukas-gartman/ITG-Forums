@@ -3,7 +3,15 @@ h2 Create a new thread
 form action="/subforum/new" method="POST"
     input type="hidden" name="id" value="#{@id}"
     p Title
-    input type="text" name="title" placeholder="Title"
+    -if session[:thread_title].nil?
+        input type="text" name="title" placeholder="Title"
+    -else
+        input type="text" name="title" placeholder="Title" value="#{session[:thread_title]}"
+        -session.delete(:thread_title)
     p Content
-    textarea name="text" placeholder="Type your text here..."
+    -if session[:thread_text].nil?
+        textarea name="text" placeholder="Type your text here..."
+    -else
+        textarea name="text" placeholder="Type your text here..." #{session[:thread_text]}
+        -session.delete(:thread_text)
     input type="submit" value="Create thread"

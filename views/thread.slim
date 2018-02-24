@@ -33,7 +33,6 @@ div.thread
     -if session[:username]
         form action="/thread/reply" method="POST"
             input name="id" type="hidden" value="#{@thread[0]}"
-            -p session[:reply_msg]
             -if session[:reply_msg].nil?
                 textarea name="message" placeholder="Reply to this thread..."
             -else

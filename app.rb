@@ -78,6 +78,9 @@ class App < Sinatra::Base
 		username_check = db.execute("SELECT username FROM accounts WHERE username = ?", username).first 
 		email_check = db.execute("SELECT email FROM accounts WHERE email = ?", email).first
 		
+		session[:register_username] = username
+		session[:register_email] = email
+
 		if !username_check.nil?
 			flash[:error] = "Username already exists"
 			redirect back
@@ -95,6 +98,8 @@ class App < Sinatra::Base
 			redirect back
 		else
 			db.execute("INSERT INTO accounts (username, encrypted_pass, email) VALUES (?, ?, ?)", username, encrypted_pass, email)
+			session.delete(:register_username)
+			session.delete(:register_email)
 			session[:username] = username
 			session[:profile_picture] = "/uploads/profile-picture/default.svg"
 			# @user = session[:username]
@@ -242,9 +247,16 @@ class App < Sinatra::Base
 		id = params['id']
 		title = params['title']
 		text = params['text']
+		session[:thread_title] = title
+		session[:thread_text] = text
 
-		forum = db.execute("SELECT forum FROM subforums WHERE id = ?", id).first.first
-		permission = db.execute("SELECT permission FROM forums WHERE id = ?", forum).first.first
+		begin
+			forum = db.execute("SELECT forum FROM subforums WHERE id = ?", id).first.first
+			permission = db.execute("SELECT permission FROM forums WHERE id = ?", forum).first.first
+		rescue
+			session[:url] = "/subforum/#{id}"
+			redirect '/not_found'
+		end
 
 		if @admin
 			unless permission <= 3
@@ -267,15 +279,31 @@ class App < Sinatra::Base
 		end
 
 		begin
-			db.execute("INSERT INTO threads (title, text, owner, subforum) VALUES (?, ?, ?, ?)", title, text, session[:username], id)
-			thread_id = db.execute("SELECT last_insert_rowid() FROM threads").first.first
-			flash[:success] = "Thread created successfully!"
-			redirect "/thread/#{thread_id}"
+			if title.empty?
+				flash[:error] = "Title may not be empty."
+				redirect back
+			elsif title.length > 40
+				flash[:error] = "Title may not exceed 40 characters."
+				redirect back
+			elsif text.length < 10
+				flash[:error] = "Message is too short. Please do not post unnecessary spam messages that does not contribute to anything."
+				redirect back
+			elsif text.length > 10000
+				flash[:error] = "Message may not exceed 10000 characters."
+				redirect back
+			else
+				db.execute("INSERT INTO threads (title, text, owner, subforum) VALUES (?, ?, ?, ?)", title, text, session[:username], id)
+				thread_id = db.execute("SELECT last_insert_rowid() FROM threads").first.first
+				session.delete(:thread_title)
+				session.delete(:thread_text)
+				flash[:success] = "Thread created successfully!"
+				redirect "/thread/#{thread_id}"
+			end
 		rescue => ex
 			open('error_log.log', 'a') do |file|
 				file.puts "[#{Time.now.strftime("%Y-%m-%d %H:%M:%S")}] #{session[:username]}: #{ex.message}"
 			end
-			
+
 			flash[:error] = "Failed to create thread. If this is a recurring issue, please contact support for assistance."
 			redirect back
 		end
@@ -387,7 +415,7 @@ class App < Sinatra::Base
 						flash[:error] = "Message is too short. Please do not post unnecessary spam messages that does not contribute to anything."
 						redirect back
 					elsif message.length > 10000
-						flash[:error] = "Message exceeds 10000 characters."
+						flash[:error] = "Message may not exceed 10000 characters."
 						redirect back
 					else
 						db.execute("INSERT INTO posts (thread, text, owner) VALUES (?, ?, ?)", id, message, session[:username])
