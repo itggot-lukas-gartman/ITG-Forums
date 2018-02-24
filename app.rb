@@ -16,6 +16,10 @@ class App < Sinatra::Base
 	# $admin = false
 
 	before do
+		if @title.nil?
+			@title = "ITG Forums"
+		end
+
 		if session[:username]
 			@user = session[:username]
 			rank = db.execute("SELECT rank FROM accounts WHERE username = ?", session[:username]).first.first
@@ -58,6 +62,20 @@ class App < Sinatra::Base
 		@forums = db.execute("SELECT * FROM forums")
 		@subforums = db.execute("SELECT * FROM subforums")
 		@threadinfo = db.execute("SELECT id, subforum, title, owner, date FROM threads")
+		@posts = []
+		for thread in @threadinfo
+			post = db.execute("SELECT thread, owner, date FROM posts WHERE thread = ? ORDER BY id DESC LIMIT 1", thread[0]).first
+			if post.nil?
+				original_post = [thread[0], thread[3], thread[4], thread[2], thread[1]]
+				@posts.push(original_post)
+			else
+				post.push(thread[2])
+				post.push(thread[1])
+				@posts.push(post)
+				# @posts.push(thread[1])
+			end
+		end
+		p @posts
 		# @postinfo = db.execute("SELECT * FROM posts GROUP BY subforum")
 		
 		# flash[:success] = "haha lol"
@@ -216,6 +234,7 @@ class App < Sinatra::Base
 
 	
 	get '/subforum/:id/new' do
+		@title = "ITG Forums | New thread"
 		@id = params['id']
 		forum = db.execute("SELECT forum FROM subforums WHERE id = ?", @id).first.first
 		permission = db.execute("SELECT permission FROM forums WHERE id = ?", forum).first.first
@@ -411,7 +430,10 @@ class App < Sinatra::Base
 				forum_id = db.execute("SELECT forum FROM subforums WHERE id = ?", subforum_id).first.first
 				forum_permission = db.execute("SELECT permission FROM forums WHERE id = ?", forum_id).first.first
 				if user_rank >= forum_permission
-					if message.length < 10
+					if message.empty?
+						flash[:error] = "Message may not be empty."
+						redirect back
+					elsif message.length < 10
 						flash[:error] = "Message is too short. Please do not post unnecessary spam messages that does not contribute to anything."
 						redirect back
 					elsif message.length > 10000
@@ -429,6 +451,7 @@ class App < Sinatra::Base
 				end
 			rescue
 				# session[:url] = request.fullpath
+				session[:url] = "/thread/#{id}"
 				redirect '/not_found'
 			end
 		else
@@ -462,4 +485,23 @@ class App < Sinatra::Base
 
 		slim :users
 	end
+
+
+	get '/set_cookie' do
+		response.set_cookie 'test', :value => 'cookie value', :max_age => '2592000'
+		"cookie set"
+	end
+
+	get '/get_cookie' do
+		# puts request.cookies
+		request.cookies['test']
+		lol = response.methods
+		for ha in lol
+			ha = ha.to_s
+			if ha.include?("set")
+				puts ha
+			end
+		end
+	end
+
 end

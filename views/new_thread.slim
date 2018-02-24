@@ -4,14 +4,14 @@ form action="/subforum/new" method="POST"
     input type="hidden" name="id" value="#{@id}"
     p Title
     -if session[:thread_title].nil?
-        input type="text" name="title" placeholder="Title"
+        input type="text" name="title" placeholder="Title" required=""
     -else
-        input type="text" name="title" placeholder="Title" value="#{session[:thread_title]}"
+        input type="text" name="title" placeholder="Title" required="" value="#{session[:thread_title]}"
         -session.delete(:thread_title)
     p Content
     -if session[:thread_text].nil?
-        textarea name="text" placeholder="Type your text here..."
+        textarea name="text" placeholder="Type your text here..." required=""
     -else
-        textarea name="text" placeholder="Type your text here..." #{session[:thread_text]}
+        textarea name="text" placeholder="Type your text here..." required="" #{session[:thread_text]}
         -session.delete(:thread_text)
     input type="submit" value="Create thread"
