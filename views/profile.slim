@@ -1,0 +1,24 @@
+==display :'utils/flash'
+div.profile-info
+    div
+        -if @user == @account[1]
+            form id="update-picture" action="/profile/update-picture" enctype="multipart/form-data" method="POST"
+                input type="hidden" name="username" value="#{@account[1]}"
+                label for="picture-file"
+                    img.edit-image src="#{@account[5]}" title="Update picture"
+                input id="picture-file" type="file" name="file"
+        -else
+            img src="#{@account[5]}"
+    div.profile-username
+        h1 =@account[1]
+        -if @account[4] == 3
+            p.red Administrator
+        -elsif @account[4] == 2
+            p.green Moderator
+        -elsif @account[4] == -1
+            p Banned
+div.profile-stats
+    p Joined: #{@account[6]}
+    p Last active: #{@account[7]}
+    p Post count: #{@account.last}
+    p Reputation: #{@account[8]}

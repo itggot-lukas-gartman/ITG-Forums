@@ -6,8 +6,14 @@ function toggleProfile() {
 	document.getElementById("user-menu").classList.toggle("hidden");
 }
 
-$(document).click(function(event) { 
-	console.log("click")
+$(document).ready(function() {
+	$('#picture-file').change(function() {
+		$('#update-picture').submit();
+		$('body').append('<div class="dim"><img src="/img/loading.gif" /></div>');
+	});
+});
+
+$(document).click(function(event) {
 	if(!$(event.target).closest('.user-container').length) {
 		if($('#login-form').is(":visible")) {
 			$('#login-form').addClass("hidden")

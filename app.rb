@@ -8,7 +8,7 @@ class App < Sinatra::Base
 		end
 	end
 	
-	helpers Sinatra::Streaming
+	# helpers Sinatra::Streaming
 	
 	db = SQLite3::Database.open('db/database.sqlite')
 	# $user = false
@@ -75,10 +75,7 @@ class App < Sinatra::Base
 				# @posts.push(thread[1])
 			end
 		end
-		p @posts
-		# @postinfo = db.execute("SELECT * FROM posts GROUP BY subforum")
-		
-		# flash[:success] = "haha lol"
+
 		slim :index
 	end
 	
@@ -226,12 +223,56 @@ class App < Sinatra::Base
 		username = params[:username]
 		begin
 			@account = db.execute("SELECT * FROM accounts WHERE username = ?", username).first
+			thread_count = db.execute("SELECT COUNT(owner) FROM threads WHERE owner = ?", username).first.first
+			post_count = db.execute("SELECT COUNT(owner) FROM posts WHERE owner = ?", username).first.first
+			total_post_count = thread_count + post_count
+			@account.push(total_post_count)
 		rescue
 			session[:url] = request.fullpath
 			redirect '/not_found'
 		end
+		slim :profile
 	end
 
+	post '/profile/update-picture' do
+		username = params[:username]
+		if session[:username] == username || @admin
+			unless params[:file] && (tmpfile = params[:file][:tempfile]) && (name = params[:file][:filename])
+				flash[:error] = "No file selected"
+			end
+			
+			name = name.split(".")
+			extension = name[1].downcase
+			accepted_extensions = ["png", "jpg", "jpeg", "gif", "webp"]
+			# STDERR.puts "Uploading file, original name #{name.inspect}"
+			if accepted_extensions.include?(extension)
+				if tmpfile.length > 5000000
+					flash[:error] = "File size exceeds 5MB"
+					redirect back
+				end
+
+				Dir.glob("public/uploads/profile-picture/#{username}.*").each do |file|
+					File.delete(file)
+				end
+
+				File.open("public/uploads/profile-picture/#{username}.#{extension}", 'wb') do |file|
+					file.write(tmpfile.read)
+				end
+
+				db.execute("UPDATE accounts SET picture = ? WHERE username = ?", "/uploads/profile-picture/#{username}.#{extension}", username)
+				session[:profile_picture] = "/uploads/profile-picture/#{username}.#{extension}"
+				
+				flash[:success] = "Profile picture updated successfully"
+				redirect back
+			else
+				flash[:error] = "Unsupported file format. We accept png, jpg, gif and webp."
+				redirect back
+			end
+		else
+			session[:denied] = "You don't have permission to update someone else's profile picture."
+			redirect '/denied'
+		end
+	end
 	
 	get '/subforum/:id/new' do
 		@title = "ITG Forums | New thread"

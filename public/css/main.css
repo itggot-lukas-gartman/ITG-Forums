@@ -2,6 +2,15 @@
 	display: none !important;
 }
 
+/* colors */
+.red {
+	color: red;
+}
+
+.green {
+	color: green;
+}
+
 /* flash */
 .alert {
 	display: flex;
@@ -28,22 +37,11 @@
 	justify-content: center;
 	align-items: center;
 	position: fixed;
-	background-color: rgba(0, 0, 0, 0.3);
+	background-color: rgba(0, 0, 0, 0.5);
 	top: 0;
 	left: 0;
 	width: 100vw;
 	height: 100vh;
-}
-
-.loading {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	width: 40vw;
-	height: 20vh;
-	border-radius: 10px;
-	z-index: 1;
-	background-color: white;
 }
 
 /* utils */
@@ -149,9 +147,12 @@ header {
 }
 
 .profile-picture {
-	border-radius: 10px;
+	border-radius: 50%;
 	margin-right: 5px;
 	width: 30px;
+	height: 30px;
+	object-fit: cover;
+	overflow: hidden;
 	cursor: pointer;
 }
 
@@ -301,6 +302,7 @@ nav {
 
 .picture > a > .profile-picture {
 	width: 40px;
+	height: 40px;
 	margin-top: 10px;
 }
 
@@ -326,7 +328,8 @@ nav {
 }
 
 .post-owner > .profile-picture {
-	width: 75px;
+	width: 80px;
+	height: 80px;
 	margin: 10px 0;
 }
 
@@ -445,6 +448,46 @@ form[action="settings/password"] > input[type="text"], form[action="settings/pas
 
 .user-picture > a > .profile-picture {
 	width: 50px;
+	height: 50px;
+}
+
+
+/* Profile */
+.profile-info {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.profile-info * img {
+	width: 75px;
+	margin: 10px;
+	
+}
+
+form[action="/profile/update-picture"] > input[type="file"] {
+	display: none;
+}
+
+form[action="/profile/update-picture"] > label {
+	/* background: none;
+	border: none; */
+	cursor: pointer;
+	transition: 0.2s;
+}
+
+form[action="/profile/update-picture"] > label:hover {
+	filter: brightness(75%);
+}
+
+
+.profile-username > h1 {
+	font-weight: 400;
+	margin: 10px 0;
+}
+
+.profile-username > p {
+	margin: 0;
 }
 
 
