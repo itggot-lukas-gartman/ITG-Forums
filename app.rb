@@ -22,6 +22,7 @@ class App < Sinatra::Base
 
 		if session[:username]
 			@user = session[:username]
+			db.execute("UPDATE accounts SET last_active = (SELECT datetime('now')) WHERE username = ?", session[:username])
 			rank = db.execute("SELECT rank FROM accounts WHERE username = ?", session[:username]).first.first
 			if rank == 3
 				@admin = true
