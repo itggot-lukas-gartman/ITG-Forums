@@ -242,7 +242,7 @@ class App < Sinatra::Base
 				flash[:error] = "No file selected"
 			end
 			
-			name = name.split(".")
+			name = name.split(".") unless !name.include?(".")
 			extension = name[1].downcase
 			accepted_extensions = ["png", "jpg", "jpeg", "gif", "webp"]
 			# STDERR.puts "Uploading file, original name #{name.inspect}"
@@ -261,7 +261,7 @@ class App < Sinatra::Base
 				end
 
 				db.execute("UPDATE accounts SET picture = ? WHERE username = ?", "/uploads/profile-picture/#{username}.#{extension}", username)
-				session[:profile_picture] = "/uploads/profile-picture/#{username}.#{extension}"
+				session[:profile_picture] = "/uploads/profile-picture/#{username}.#{extension}" if session[:username] == username
 				
 				flash[:success] = "Profile picture updated successfully"
 				redirect back

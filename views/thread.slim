@@ -22,7 +22,7 @@ div.thread
     -@posts.each_with_index do |post, i|
         div.post
             div.post-owner
-                a href="#{post[3]}" #{post[3]}
+                a href="/profile/#{post[3]}" #{post[3]}
                 img.profile-picture src="#{@post_owners[i][5]}"
                 p #{@post_owners[i][-1]} posts
                 p #{@post_owners[i][8]} rep
