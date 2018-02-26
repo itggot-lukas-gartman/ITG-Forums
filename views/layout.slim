@@ -24,6 +24,8 @@ html
 							form action="/login" method="POST"
 								input type="text" name="username" placeholder="Username" required=""
 								input type="password" name="password" placeholder="Password" required=""
+								div.remember
+									input type="checkbox" name="remember" Remember me
 								input type="submit" value="Login"
 								
 					-if @user

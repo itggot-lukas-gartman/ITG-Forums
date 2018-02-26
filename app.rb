@@ -127,6 +127,7 @@ class App < Sinatra::Base
 	post '/login' do
 		username = params['username'].downcase
 		password = params['password']
+		remember = params['remember']
 		credentials = db.execute("SELECT username, encrypted_pass, picture FROM accounts WHERE username = ?", username).first
 		if credentials.nil?
 			flash[:error] = "Invalid username or password"
@@ -135,6 +136,7 @@ class App < Sinatra::Base
 			encrypted_pass = BCrypt::Password.new(credentials[1])
 			if (credentials.first.downcase == username.downcase) && (encrypted_pass == password)
 				session[:username] = username
+				session.options[:expire_after] = 2592000 unless remember.nil?
 				# @user = session[:username]
 				session[:profile_picture] = credentials[2]
 				# rank = db.execute("SELECT rank FROM accounts WHERE username = ?", username).first.first

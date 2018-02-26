@@ -146,6 +146,12 @@ header {
 	margin-bottom: 10px;
 }
 
+.remember {
+	display: flex;
+	flex-direction: row;
+	margin-top: 10px;
+}
+
 .profile-picture {
 	border-radius: 50%;
 	margin-right: 5px;
