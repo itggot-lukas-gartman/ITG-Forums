@@ -310,8 +310,10 @@ class App < Sinatra::Base
 		id = params['id']
 		title = params['title']
 		text = params['text']
+		# content = [title, text]
 		session[:thread_title] = title
 		session[:thread_text] = text
+		# response.set_cookie 'new_thread', :value => content, :max_age => '2592000'
 
 		begin
 			forum = db.execute("SELECT forum FROM subforums WHERE id = ?", id).first.first
@@ -394,6 +396,7 @@ class App < Sinatra::Base
 			end
 
 			@threads = db.execute("SELECT * FROM threads WHERE subforum = ?", id)
+			# @threads = threads.each_slice(15).to_a
 			@latest_posts = []
 			for thread in @threads
 				post = db.execute("SELECT thread, owner, date FROM posts WHERE thread = ?", thread[0]).last
@@ -467,6 +470,8 @@ class App < Sinatra::Base
 			id = params['id']
 			message = params['message']
 			session[:reply_msg] = message
+			# response.set_cookie 'reply_message', :value => message, :max_age => '2592000'
+			# response.delete_cookie 'reply_message'
 
 			begin
 				user_rank = db.execute("SELECT rank FROM accounts WHERE username = ?", session[:username]).first.first

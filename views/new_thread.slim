@@ -4,9 +4,9 @@ form action="/subforum/new" method="POST"
     input type="hidden" name="id" value="#{@id}"
     p Title
     -if session[:thread_title].nil?
-        input type="text" name="title" placeholder="Title" required=""
+        input type="text" name="title" placeholder="Title" maxlength="40" required=""
     -else
-        input type="text" name="title" placeholder="Title" required="" value="#{session[:thread_title]}"
+        input type="text" name="title" placeholder="Title" maxlength="40" required="" value="#{session[:thread_title]}"
         -session.delete(:thread_title)
     p Content
     -if session[:thread_text].nil?

@@ -35,6 +35,7 @@ div.thread
             input name="id" type="hidden" value="#{@thread[0]}"
             -if session[:reply_msg].nil?
                 textarea name="message" placeholder="Reply to this thread..." required=""
+            / -response.delete_cookie 'reply_message'
             -else
                 textarea name="message" placeholder="Reply to this thread..." required="" #{session[:reply_msg]}
                 -session.delete(:reply_msg)

@@ -4,9 +4,9 @@ div.register
 	form action="register" method="POST"
 		p Username
 		-if session[:register_username].nil?
-			input[type="text" name="username" required]
+			input[type="text" name="username" maxlength="16" required]
 		-else
-			input[type="text" name="username" required value="#{session[:register_username]}"]
+			input[type="text" name="username" maxlength="16" required value="#{session[:register_username]}"]
 			-session.delete(:register_username)
 		p Email
 		-if session[:register_email].nil?

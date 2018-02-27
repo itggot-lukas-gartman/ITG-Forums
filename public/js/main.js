@@ -8,8 +8,13 @@ function toggleProfile() {
 
 $(document).ready(function() {
 	$('#picture-file').change(function() {
-		$('#update-picture').submit();
-		$('body').append('<div class="dim"><img src="/img/loading.gif" /></div>');
+		var fileSize = (this.files[0].size);
+		if (fileSize < 5000000) {
+			$('#update-picture').submit();
+			$('body').append('<div class="dim"><img src="/img/loading.gif" /></div>');
+		} else {
+			alert("File size may not exceed 5MB")
+		}
 	});
 });
 
