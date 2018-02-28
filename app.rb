@@ -62,7 +62,7 @@ class App < Sinatra::Base
 		
 		@forums = db.execute("SELECT * FROM forums")
 		@subforums = db.execute("SELECT * FROM subforums")
-		@threadinfo = db.execute("SELECT id, subforum, title, owner, date FROM threads")
+		@threadinfo = db.execute("SELECT id, subforum, title, owner, date FROM threads ORDER BY date")
 		@posts = []
 		for thread in @threadinfo
 			post = db.execute("SELECT thread, owner, date FROM posts WHERE thread = ? ORDER BY id DESC LIMIT 1", thread[0]).first
@@ -395,8 +395,9 @@ class App < Sinatra::Base
 				redirect '/not_found'
 			end
 
-			@threads = db.execute("SELECT * FROM threads WHERE subforum = ?", id)
-			# @threads = threads.each_slice(15).to_a
+			@threads = db.execute("SELECT * FROM threads WHERE subforum = ? ORDER BY date DESC", id)
+			# test = @threads.each_slice(15).to_a
+
 			@latest_posts = []
 			for thread in @threads
 				post = db.execute("SELECT thread, owner, date FROM posts WHERE thread = ?", thread[0]).last

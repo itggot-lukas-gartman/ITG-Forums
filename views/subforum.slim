@@ -8,7 +8,7 @@ div.divider
         | This subforum is empty
     -else
         | There are #{@threads.length} threads in this subforum
--for thread in @threads.reverse
+-for thread in @threads
     div.thread-container
         div.thread-info
             a href="/thread/#{thread[0]}" #{thread[1]}
@@ -17,7 +17,7 @@ div.divider
                 a href="/profile/#{thread[3]}"
                     | #{thread[3]}
                 |, #{DateTime.parse(thread[6]).strftime("%F")}
-        -for post in @latest_posts.reverse
+        -for post in @latest_posts
             -if post[0] == thread[0]
                 div.thread-stats
                     div.picture
