@@ -13,6 +13,9 @@ require_relative 'app.rb'
 #For parsing dates and timestamps
 require 'date'
 
+#For compressing images
+# require 'RMagick'
+
 #FileUtils for handling file uploads
 require 'fileutils'
 

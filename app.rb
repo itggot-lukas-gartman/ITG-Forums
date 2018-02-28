@@ -261,6 +261,13 @@ class App < Sinatra::Base
 				File.open("public/uploads/profile-picture/#{username}.#{extension}", 'wb') do |file|
 					file.write(tmpfile.read)
 				end
+				unless extension == "gif"
+					image = Magick::Image.read("public/uploads/profile-picture/#{username}.#{extension}").first
+					image.change_geometry!("64x64") do |cols, rows, img|
+						newimg = img.resize(cols, rows)
+						newimg.write("public/uploads/profile-picture/#{username}.#{extension}")
+					end
+				end
 
 				db.execute("UPDATE accounts SET picture = ? WHERE username = ?", "/uploads/profile-picture/#{username}.#{extension}", username)
 				session[:profile_picture] = "/uploads/profile-picture/#{username}.#{extension}" if session[:username] == username

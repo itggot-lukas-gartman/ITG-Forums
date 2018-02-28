@@ -16,7 +16,8 @@ div.thread
             p #{@thread_owner[-1]} posts
             p #{@thread_owner[8]} rep
         div.post-content
-            p #{@thread[2]}
+            pre
+                p #{@thread[2]}
             i.post-date Posted #{@thread[6]}
 
     -@posts.each_with_index do |post, i|
@@ -27,7 +28,8 @@ div.thread
                 p #{@post_owners[i][-1]} posts
                 p #{@post_owners[i][8]} rep
             div.post-content
-                p #{post[2]}
+                pre
+                    p #{post[2]}
                 i.post-date Posted #{post[5]}
 
     -if session[:username]
