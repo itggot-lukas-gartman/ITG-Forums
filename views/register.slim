@@ -10,12 +10,12 @@ div.register
 			-session.delete(:register_username)
 		p Email
 		-if session[:register_email].nil?
-			input[type="email" name="email" required]
+			input[type="email" name="email" maxlength="254" required]
 		-else
-			input[type="email" name="email" required value="#{session[:register_email]}"]
+			input[type="email" name="email" maxlength="254" required value="#{session[:register_email]}"]
 			-session.delete(:register_email)
 		p Password
-		input[type="password" name="password" required]
+		input[type="password" name="password" maxlength="64" required]
 		p Repeat password
-		input[type="password" name="password_repeat" required]
+		input[type="password" name="password_repeat" maxlength="64" required]
 		input type="submit" value="Create account"

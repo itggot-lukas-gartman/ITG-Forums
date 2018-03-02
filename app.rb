@@ -101,7 +101,7 @@ class App < Sinatra::Base
 			flash[:error] = "Username already exists"
 			redirect back
 		elsif !email_check.nil?
-			flash[:error] = "Email is already in use"
+			flash[:error] = "Email address is already in use"
 			redirect back
 		elsif !/^[a-zA-Z0-9_]\w{2,15}$/.match(username)
 			flash[:error] = "Username may only contain characters (A-Z), numbers (0-9), underscores and be 3-16 characters long"
@@ -109,8 +109,10 @@ class App < Sinatra::Base
 		elsif !/\A([\w+\-].?)+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/i.match(email)
 			flash[:error] = "Please enter a valid email address."
 			redirect back
-		elsif password.length < 6
-			flash[:error] = "Password must be at least 6 characters long"
+		elsif email.length > 254
+			flash[:error] = "Email may not exceed 254 characters."
+		elsif password.length < 6 || password.length > 64
+			flash[:error] = "Password must be 6-64 characters long."
 			redirect back
 		else
 			db.execute("INSERT INTO accounts (username, encrypted_pass, email) VALUES (?, ?, ?)", username, encrypted_pass, email)
@@ -182,9 +184,21 @@ class App < Sinatra::Base
 	post '/settings/email' do
 		if session[:username]
 			new_email = params['email']
-			db.execute("UPDATE accounts SET email = ? WHERE username = ?", new_email, session[:username])
-			flash[:success] = "Email updated"
-			redirect back
+			email_check = db.execute("SELECT email FROM accounts WHERE email = ?", new_email).first
+			if !email_check.nil?
+				flash[:error] = "Email address is already in use."
+				redirect back
+			elsif new_email.length > 254
+				flash[:error] = "Email address may not exceed 254 characters."
+				redirect back
+			elsif !/\A([\w+\-].?)+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/i.match(new_email)
+				flash[:error] = "Please enter a valid email address."
+				redirect back
+			else
+				db.execute("UPDATE accounts SET email = ? WHERE username = ?", new_email, session[:username])
+				flash[:success] = "Email updated!"
+				redirect back
+			end
 		else
 			session[:denied] = "You are not logged in."
 			redirect '/denied'
@@ -199,8 +213,8 @@ class App < Sinatra::Base
 			db_pass = db.execute("SELECT encrypted_pass FROM accounts WHERE username = ?", session[:username]).first.first
 			encrypted_pass = BCrypt::Password.new(db_pass)
 			if encrypted_pass == old_password
-				if new_password.length < 6
-					flash[:error] = "New password must be at least 6 characters long."
+				if new_password.length < 6 || new_password.length > 64
+					flash[:error] = "New password must be 6-64 characters long."
 					redirect back
 				else
 					new_encrypted_pass = BCrypt::Password.create(new_password)
@@ -246,7 +260,7 @@ class App < Sinatra::Base
 			
 			name = name.split(".") unless !name.include?(".")
 			extension = name[1].downcase
-			accepted_extensions = ["png", "jpg", "jpeg", "gif", "webp"]
+			accepted_extensions = ["png", "jpg", "jpeg", "gif", "bmp", "tif", "tiff", "svg", "webp"]
 			# STDERR.puts "Uploading file, original name #{name.inspect}"
 			if accepted_extensions.include?(extension)
 				if tmpfile.length > 5000000
@@ -261,9 +275,9 @@ class App < Sinatra::Base
 				File.open("public/uploads/profile-picture/#{username}.#{extension}", 'wb') do |file|
 					file.write(tmpfile.read)
 				end
-				unless extension == "gif"
+				unless extension == "gif" || extension == "svg"
 					image = Magick::Image.read("public/uploads/profile-picture/#{username}.#{extension}").first
-					image.change_geometry!("64x64") do |cols, rows, img|
+					image.change_geometry!("128x128") do |cols, rows, img|
 						newimg = img.resize(cols, rows)
 						newimg.write("public/uploads/profile-picture/#{username}.#{extension}")
 					end
@@ -275,7 +289,7 @@ class App < Sinatra::Base
 				flash[:success] = "Profile picture updated successfully"
 				redirect back
 			else
-				flash[:error] = "Unsupported file format. We accept png, jpg, gif and webp."
+				flash[:error] = "Unsupported file format. We accept png, jpg, gif, bmp, tif, svg and webp."
 				redirect back
 			end
 		else

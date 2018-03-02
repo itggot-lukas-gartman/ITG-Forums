@@ -476,8 +476,8 @@ form[action="settings/password"] > input[type="text"], form[action="settings/pas
 
 .profile-info * img {
 	width: 75px;
+	max-height: 75px;
 	margin: 10px;
-	
 }
 
 form[action="/profile/update-picture"] > input[type="file"] {
