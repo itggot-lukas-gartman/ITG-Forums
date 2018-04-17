@@ -97,11 +97,15 @@ class App < Sinatra::Base
 	
 	get '/register' do
 		@title = "ITG Forums | Register"
-		
+		if session[:username]
+			flash[:error] = "You are already logged in"
+			redirect '/'
+		end
 		slim :register
 	end
 	
 	post '/register' do
+		redirect '/' if session[:username]
 		username = params['username'].downcase
 		password = params['password']
 		email = params['email'].downcase
@@ -516,10 +520,39 @@ class App < Sinatra::Base
 				session[:denied] = "You don't have permission to view this forum."
 				redirect '/denied'
 			end
-		rescue
+		rescue Exception => ex
+			puts ex
 			session[:url] = request.fullpath
 			redirect '/not_found'
 		end
+	end
+
+	post '/thread/:id/rating/up' do
+		id = params[:id]
+		db.execute("UPDATE threads SET rating = rating + 1 WHERE id = ?", id)
+		post_owner = db.execute("SELECT owner FROM threads WHERE id = ?", id).first
+		db.execute("UPDATE accounts SET reputation = reputation + 1 WHERE username = ?", post_owner)
+	end
+
+	post '/thread/:id/rating/down' do
+		id = params[:id]
+		db.execute("UPDATE threads SET rating = rating - 1 WHERE id = ?", id)
+		post_owner = db.execute("SELECT owner FROM threads WHERE id = ?", id).first
+		db.execute("UPDATE accounts SET reputation = reputation - 1 WHERE username = ?", post_owner)
+	end
+
+	post '/post/:id/rating/up' do
+		id = params[:id]
+		db.execute("UPDATE posts SET rating = rating + 1 WHERE id = ?", id)
+		post_owner = db.execute("SELECT owner FROM posts WHERE id = ?", id).first
+		db.execute("UPDATE accounts SET reputation = reputation + 1 WHERE username = ?", post_owner)
+	end
+
+	post '/post/:id/rating/down' do
+		id = params[:id]
+		db.execute("UPDATE posts SET rating = rating - 1 WHERE id = ?", id)
+		post_owner = db.execute("SELECT owner FROM posts WHERE id = ?", id).first
+		db.execute("UPDATE accounts SET reputation = reputation - 1 WHERE username = ?", post_owner)
 	end
 
 	post '/thread/reply' do

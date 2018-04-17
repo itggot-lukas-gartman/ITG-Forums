@@ -11,19 +11,16 @@ h2 Forum categories
 							a href="/subforum/#{subforum[0]}" #{subforum[1]}
 							p #{subforum[2]}
 						div.subforum-last_post
-							-latest_post = []
-							-for post in @posts
-								-if post.last == subforum[0]
-									-latest_post.push(post)
-							-if latest_post.last.nil?
-								p No threads
-							-else
-								a href="/thread/#{latest_post.last[0]}" #{latest_post.last[3]}
-								span
-									| By 
-									a href="/profile/#{latest_post.last[1]}"
-										| #{latest_post.last[1]}
-									|, #{DateTime.parse(latest_post.last[2]).strftime("%F")}
+							-for post in @latest_posts
+								-if post.nil?
+									-next
+								-if post[3] == subforum[0]
+									a href="/thread/#{post[0]}" #{post[1]}
+									span
+										| By 
+										a href="/profile/#{post[2]}"
+											| #{post[2]}
+										|, #{DateTime.parse(post[4]).strftime("%F")}
 
 	-elsif @mod
 		-if forum[2] <= 2
@@ -36,19 +33,16 @@ h2 Forum categories
 								a href="/subforum/#{subforum[0]}" #{subforum[1]}
 								p #{subforum[2]}
 							div.subforum-last_post
-								-latest_post = []
-								-for post in @posts
-									-if post.last == subforum[0]
-										-latest_post.push(post)
-								-if latest_post.last.nil?
-									p No threads
-								-else
-									a href="/thread/#{latest_post.last[0]}" #{latest_post.last[3]}
-									span
-										| By 
-										a href="/profile/#{latest_post.last[1]}"
-											| #{latest_post.last[1]}
-										|, #{DateTime.parse(latest_post.last[2]).strftime("%F")}
+								-for post in @latest_posts
+									-if post.nil?
+										-next
+									-if post[3] == subforum[0]
+										a href="/thread/#{post[0]}" #{post[1]}
+										span
+											| By 
+											a href="/profile/#{post[2]}"
+												| #{post[2]}
+											|, #{DateTime.parse(post[4]).strftime("%F")}
 
 	-elsif @user
 		-if forum[2] <= 1
@@ -61,19 +55,16 @@ h2 Forum categories
 								a href="/subforum/#{subforum[0]}" #{subforum[1]}
 								p #{subforum[2]}
 							div.subforum-last_post
-								-latest_post = []
-								-for post in @posts
-									-if post.last == subforum[0]
-										-latest_post.push(post)
-								-if latest_post.last.nil?
-									p No threads
-								-else
-									a href="/thread/#{latest_post.last[0]}" #{latest_post.last[3]}
-									span
-										| By 
-										a href="/profile/#{latest_post.last[1]}"
-											| #{latest_post.last[1]}
-										|, #{DateTime.parse(latest_post.last[2]).strftime("%F")}
+								-for post in @latest_posts
+									-if post.nil?
+										-next
+									-if post[3] == subforum[0]
+										a href="/thread/#{post[0]}" #{post[1]}
+										span
+											| By 
+											a href="/profile/#{post[2]}"
+												| #{post[2]}
+											|, #{DateTime.parse(post[4]).strftime("%F")}
 
 	-else
 		-if forum[2] == 0

@@ -378,6 +378,11 @@ nav {
 	word-wrap: break-word;
 }
 
+.post-tools {
+	display: flex;
+	justify-content: space-between;
+}
+
 form[action="/subforum/new"] > input[type="text"] {
 	width: 200px;
 }
@@ -530,7 +535,16 @@ form[action="/profile/update-picture"] > label:hover {
 		width: 95vw;
 		/* transition: all 0.1s; */
 	}
+}
 
+@media screen and (max-width: 500px) {
+	.post-tools {
+		flex-direction: column;
+	}
+
+	.post-tools > div > .button {
+		margin: 5px 10px 5px 0;
+	}
 }
 
 @media screen and (max-width: 465px) {

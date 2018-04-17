@@ -18,7 +18,13 @@ div.thread
         div.post-content
             pre
                 p #{@thread[2]}
-            i.post-date Posted #{@thread[6]}
+            div.post-tools
+                i.post-date Posted #{@thread[6]}
+                -if session[:username]
+                    div
+                        a.button onclick="newServerAjaxCall('#{request.path_info}/rating/up', null, 'upvote(\'thread-#{@thread[0]}\')')" +
+                        a.button onclick="newServerAjaxCall('#{request.path_info}/rating/down', null, 'downvote(\'thread-#{@thread[0]}\')')" -
+                        span.button id="thread-#{@thread[0]}" =@thread[5]
 
     -@posts.each_with_index do |post, i|
         div.post
@@ -30,7 +36,13 @@ div.thread
             div.post-content
                 pre
                     p #{post[2]}
-                i.post-date Posted #{post[5]}
+                div.post-tools
+                    i.post-date Posted #{post[5]}
+                    -if session[:username]
+                        div
+                            a.button onclick="newServerAjaxCall('/post/#{post[0]}/rating/up', null, 'upvote(\'post-#{post[0]}\')')" +
+                            a.button onclick="newServerAjaxCall('/post/#{post[0]}/rating/down', null, 'downvote(\'post-#{post[0]}\')')" -
+                            span.button id="post-#{post[0]}" =post[4]
 
     -if session[:username]
         form action="/thread/reply" method="POST"
