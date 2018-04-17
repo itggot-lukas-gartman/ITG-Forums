@@ -129,6 +129,11 @@ header {
 	background-color: #3c5972;
 }
 
+.active {
+	/* color: blue; */
+	background-color: #3c6994;
+}
+
 .caret-down {
 	width: 20px;
 	cursor: pointer;
@@ -251,7 +256,7 @@ nav {
 	margin-right: 5px;
 }
 
-.subforum-info > a, .subforum-last_thread > a, .thread-info > a, .thread-stats > .last-post > a {
+.subforum-info > a, .subforum-last_post > a, .thread-info > a, .thread-stats > .last-post > a {
 	font-size: 1.2em;
 }
 
@@ -259,20 +264,20 @@ nav {
 	margin: 5px 0;
 }
 
-.subforum-last_thread, .last-post {
+.subforum-last_post, .last-post {
 	display: flex;
 	flex-direction: column;
 	width: 25%;
 	min-width: 120px;
 }
 
-.subforum-last_thread > a, .thread-info > a {
+.subforum-last_post > a, .thread-info > a {
 	text-overflow: ellipsis;
 	overflow: hidden;
 	white-space: nowrap;
 }
 
-.subforum-last_thread > span {
+.subforum-last_post > span {
 	margin: 5px 0;
 	font-size: 0.9em;
 }
@@ -288,6 +293,15 @@ nav {
 
 .subforum-tools > h2 {
 	margin: 10px 0;
+}
+
+.pagination {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	/* margin: 10px; */
+	padding: 10px;
+	/* background-color: #3c6994; */
 }
 
 .thread-container {
@@ -528,7 +542,7 @@ form[action="/profile/update-picture"] > label:hover {
 		width: 60%;
 	}
 
-	.subforum-last_thread, .last-post {
+	.subforum-last_post, .last-post {
 		width: 40%;
 	}
 }

@@ -62,20 +62,35 @@ class App < Sinatra::Base
 		
 		@forums = db.execute("SELECT * FROM forums")
 		@subforums = db.execute("SELECT * FROM subforums")
-		@threadinfo = db.execute("SELECT id, subforum, title, owner, date FROM threads ORDER BY date")
-		@posts = []
-		for thread in @threadinfo
-			post = db.execute("SELECT thread, owner, date FROM posts WHERE thread = ? ORDER BY id DESC LIMIT 1", thread[0]).first
-			if post.nil?
-				original_post = [thread[0], thread[3], thread[4], thread[2], thread[1]]
-				@posts.push(original_post)
-			else
-				post.push(thread[2])
-				post.push(thread[1])
-				@posts.push(post)
-				# @posts.push(thread[1])
+		@latest_posts = []
+		for subforum in @subforums
+			threads = db.execute("SELECT * FROM threads WHERE subforum = ?", subforum.first)
+			posts = []
+			for thread in threads
+				thread_post = db.execute("SELECT thread, owner, date FROM posts WHERE thread = ? ORDER BY date DESC LIMIT 1", thread.first).first
+				if thread_post.nil?
+					posts.push([thread[0], thread[1], thread[3], thread[4], thread[6]])
+				else
+					posts.push([thread[0], thread[1], thread_post[1], thread[4], thread_post[2]])
+				end
 			end
+			@latest_posts.push(posts.last)
 		end
+
+		# @threadinfo = db.execute("SELECT id, subforum, title, owner, date FROM threads ORDER BY date")
+		# @posts = []
+		# for thread in @threadinfo
+		# 	post = db.execute("SELECT thread, owner, date FROM posts WHERE thread = ? ORDER BY id DESC LIMIT 1", thread[0]).first
+		# 	if post.nil?
+		# 		original_post = [thread[0], thread[3], thread[4], thread[2], thread[1]]
+		# 		@posts.push(original_post)
+		# 	else
+		# 		post.push(thread[2])
+		# 		post.push(thread[1])
+		# 		@posts.push(post)
+		# 		# @posts.push(thread[1])
+		# 	end
+		# end
 
 		slim :index
 	end
@@ -416,7 +431,27 @@ class App < Sinatra::Base
 				redirect '/not_found'
 			end
 
-			@threads = db.execute("SELECT * FROM threads WHERE subforum = ? ORDER BY date DESC", id)
+			threads = db.execute("SELECT * FROM threads WHERE subforum = ? ORDER BY date DESC", id)
+			@thread_count = threads.length
+			if @thread_count > 10
+				threads_sliced = threads.each_slice(10).to_a
+				@page_count = threads_sliced.length
+				if params['page'].nil?
+					page = 0
+					redirect "/subforum/#{id}?page=1"
+				else
+					page = params['page'].to_i - 1
+				end
+				begin
+					@threads = threads_sliced[page]
+					raise "Not found" if @threads.nil?
+				rescue
+					session[:url] = request.fullpath
+					redirect '/not_found'
+				end
+			else
+				@threads = threads
+			end
 			# test = @threads.each_slice(15).to_a
 
 			@latest_posts = []
