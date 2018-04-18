@@ -77,22 +77,26 @@ class App < Sinatra::Base
 			@latest_posts.push(posts.last)
 		end
 
-		# @threadinfo = db.execute("SELECT id, subforum, title, owner, date FROM threads ORDER BY date")
-		# @posts = []
-		# for thread in @threadinfo
-		# 	post = db.execute("SELECT thread, owner, date FROM posts WHERE thread = ? ORDER BY id DESC LIMIT 1", thread[0]).first
-		# 	if post.nil?
-		# 		original_post = [thread[0], thread[3], thread[4], thread[2], thread[1]]
-		# 		@posts.push(original_post)
-		# 	else
-		# 		post.push(thread[2])
-		# 		post.push(thread[1])
-		# 		@posts.push(post)
-		# 		# @posts.push(thread[1])
-		# 	end
-		# end
-
 		slim :index
+	end
+
+	get '/activity' do
+		posts = []
+		threads = db.execute("SELECT * FROM threads ORDER BY date DESC")
+		for thread in threads
+			thread_posts = db.execute("SELECT thread, owner, date FROM posts WHERE thread = ? ORDER BY date DESC", thread.first)
+			thread_permission = db.execute("SELECT permission FROM forums WHERE id = (SELECT forum FROM subforums WHERE id = ?)", thread[4]).first.first
+			if thread_posts.empty?
+				posts.push([thread[0], thread[1], thread[3], thread[4], thread[6], thread_permission])
+			else
+				for post in thread_posts
+					posts.push([thread[0], thread[1], post[1], thread[4], post[2], thread_permission])
+				end
+			end
+		end
+		@latest_posts = posts.sort_by { |s| DateTime.parse(s[4]).strftime("%F %T") }.reverse
+
+		slim :activity
 	end
 	
 	get '/register' do
@@ -599,10 +603,10 @@ class App < Sinatra::Base
 		end
 	end
 
-	get '/activity' do
-		# @posts = db.execute("")
-		"Not implemented yet"
-	end
+	# get '/activity' do
+	# 	# @posts = db.execute("")
+	# 	"Not implemented yet"
+	# end
 
 	get '/users' do
 		@title = "ITG Forums | Users"
