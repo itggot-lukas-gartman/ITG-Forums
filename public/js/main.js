@@ -6,6 +6,14 @@ function toggleProfile() {
 	document.getElementById("user-menu").classList.toggle("hidden");
 }
 
+window.onbeforeunload = function () {
+	var title = document.forms["newThread"]["title"].value;
+	var text = document.forms["newThread"]["text"].value;
+    if (title != "" || text != "") {
+        return confirm("Are you sure you want to close the current window? Any text entered will be lost.")
+    }
+};
+
 $(document).ready(function() {
 	$('#picture-file').change(function() {
 		var fileSize = (this.files[0].size);

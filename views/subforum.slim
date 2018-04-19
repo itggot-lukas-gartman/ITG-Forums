@@ -48,9 +48,12 @@ div.divider
                             span #{DateTime.parse(thread[6]).strftime("%F")}
 -if @thread_count > 10
     div.pagination
-        -unless params['page'].to_i == 1
+        -unless params['page'].nil? || params['page'].to_i == 1
             a.button href="./#{@subforum[0]}?page=#{params['page'].to_i - 1}" Prev
         -@page_count.times do |n|
-            a.button href="./#{@subforum[0]}?page=#{n}" =n+1
+            -if params['page'].to_i == n+1
+                a.button.active href="./#{@subforum[0]}?page=#{n+1}" =n+1
+            -else
+                a.button href="./#{@subforum[0]}?page=#{n+1}" =n+1
         -unless params['page'].to_i == @page_count
             a.button href="./#{@subforum[0]}?page=#{params['page'].to_i + 1}" Next

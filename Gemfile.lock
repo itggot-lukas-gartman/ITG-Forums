@@ -17,7 +17,7 @@ GEM
       ruby_dep (~> 1.2)
     multi_json (1.12.2)
     mustermann (1.0.1)
-    rack (2.0.3)
+    rack (2.0.4)
     rack-protection (2.0.0)
       rack
     rb-fsevent (0.10.2)

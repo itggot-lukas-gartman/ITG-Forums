@@ -1,3 +1,13 @@
+class String
+	def blank?
+		self =~ /^\s*$/
+	end
+
+	def is_i?
+		/\A[-+]?\d+\z/ === self
+	end
+end
+
 class App < Sinatra::Base
 	enable :sessions
 	register Sinatra::Flash
@@ -130,7 +140,7 @@ class App < Sinatra::Base
 			flash[:error] = "Username may only contain characters (A-Z), numbers (0-9), underscores and be 3-16 characters long"
 			redirect back
 		elsif !/\A([\w+\-].?)+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/i.match(email)
-			flash[:error] = "Please enter a valid email address."
+			flash[:error] = "You must enter a valid email address."
 			redirect back
 		elsif email.length > 254
 			flash[:error] = "Email may not exceed 254 characters."
@@ -215,7 +225,7 @@ class App < Sinatra::Base
 				flash[:error] = "Email address may not exceed 254 characters."
 				redirect back
 			elsif !/\A([\w+\-].?)+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/i.match(new_email)
-				flash[:error] = "Please enter a valid email address."
+				flash[:error] = "You must enter a valid email address."
 				redirect back
 			else
 				db.execute("UPDATE accounts SET email = ? WHERE username = ?", new_email, session[:username])
@@ -350,7 +360,7 @@ class App < Sinatra::Base
 		slim :new_thread
 	end
 
-	post '/subforum/new' do
+	post '/thread/new' do
 		id = params['id']
 		title = params['title']
 		text = params['text']
@@ -388,14 +398,14 @@ class App < Sinatra::Base
 		end
 
 		begin
-			if title.empty?
+			if title.empty? || title.blank?
 				flash[:error] = "Title may not be empty."
 				redirect back
 			elsif title.length > 40
 				flash[:error] = "Title may not exceed 40 characters."
 				redirect back
-			elsif text.length < 10
-				flash[:error] = "Message is too short. Please do not post unnecessary spam messages that does not contribute to anything."
+			elsif text.length < 5
+				flash[:error] = "Message is too short. Please do not post unnecessary spam."
 				redirect back
 			elsif text.length > 10000
 				flash[:error] = "Message may not exceed 10000 characters."
@@ -408,7 +418,7 @@ class App < Sinatra::Base
 				flash[:success] = "Thread created successfully!"
 				redirect "/thread/#{thread_id}"
 			end
-		rescue => ex
+		rescue Exception => ex
 			open('error_log.log', 'a') do |file|
 				file.puts "[#{Time.now.strftime("%Y-%m-%d %H:%M:%S")}] #{session[:username]}: #{ex.message}"
 			end
@@ -524,8 +534,7 @@ class App < Sinatra::Base
 				session[:denied] = "You don't have permission to view this forum."
 				redirect '/denied'
 			end
-		rescue Exception => ex
-			puts ex
+		rescue
 			session[:url] = request.fullpath
 			redirect '/not_found'
 		end
@@ -573,11 +582,11 @@ class App < Sinatra::Base
 				forum_id = db.execute("SELECT forum FROM subforums WHERE id = ?", subforum_id).first.first
 				forum_permission = db.execute("SELECT permission FROM forums WHERE id = ?", forum_id).first.first
 				if user_rank >= forum_permission
-					if message.empty?
+					if message.empty? || message.blank?
 						flash[:error] = "Message may not be empty."
 						redirect back
 					elsif message.length < 10
-						flash[:error] = "Message is too short. Please do not post unnecessary spam messages that does not contribute to anything."
+						flash[:error] = "Message is too short. Please do not post unnecessary spam."
 						redirect back
 					elsif message.length > 10000
 						flash[:error] = "Message may not exceed 10000 characters."
@@ -593,7 +602,6 @@ class App < Sinatra::Base
 					redirect '/denied'
 				end
 			rescue
-				# session[:url] = request.fullpath
 				session[:url] = "/thread/#{id}"
 				redirect '/not_found'
 			end
@@ -629,22 +637,131 @@ class App < Sinatra::Base
 		slim :users
 	end
 
+	get '/admin' do
+		unless @admin
+			session[:denied] = "You do not have permission to view this page."
+			redirect '/denied'
+		end
+		@forum_categories = db.execute("SELECT * FROM forums ORDER BY permission ASC")
+		@subforums = db.execute("SELECT * FROM subforums ORDER BY forum ASC")
 
-	get '/set_cookie' do
-		response.set_cookie 'test', :value => 'cookie value', :max_age => '2592000'
-		"cookie set"
+		slim :admin
 	end
 
-	get '/get_cookie' do
-		# puts request.cookies
-		request.cookies['test']
-		lol = response.methods
-		for ha in lol
-			ha = ha.to_s
-			if ha.include?("set")
-				puts ha
-			end
+	post '/admin/forum/new' do
+		unless @admin
+			session[:denied] = "You do not have permission to create a new forum category."
+			redirect '/denied'
+		end
+
+		name = params['name']
+		permission = params['permission'].to_i
+
+		if name.empty? || name.blank?
+			flash[:error] = "Name must not be empty."
+			redirect back
+		elsif name.length > 40
+			flash[:error] = "Name must not exceed 40 characters."
+			redirect back
+		elsif permission.nil?
+			flash[:error] = "You must select a permission."
+			redirect back
+		elsif permission < 0 || permission > 3
+			flash[:error] = "Invalid permission."
+			redirect back
+		else
+			db.execute("INSERT INTO forums (forum_name, permission) VALUES (?, ?)", name, permission)
+			flash[:success] = "Forum category has been created!"
+			redirect back
 		end
 	end
 
+	post '/admin/forum/modify' do
+		unless @admin
+			session[:denied] = "You do not have permission to modify forum categories."
+			redirect '/denied'
+		end
+
+		modify = params['modify']
+		delete = params['delete']
+		forum_id = params['forum'].to_i
+		if modify
+			name = params['name']
+			permission = params['permission'].to_i
+			if name.empty? || name.blank?
+				flash[:error] = "Forum name must not be empty."
+				redirect back
+			elsif permission.nil?
+				flash[:error] = "You must select a permission."
+				redirect back
+			elsif permission < 0 || permission > 3
+				flash[:error] = "Invalid permission."
+				redirect back
+			else
+				db.execute("UPDATE forums SET forum_name = ?, permission = ? WHERE id = ?", name, permission, forum_id)
+			end
+			flash[:success] = "Forum has been updated!"
+			redirect back
+		elsif delete
+			subforums = db.execute("SELECT * FROM subforums WHERE forum = ?", forum_id)
+			for subforum in subforums
+				threads = db.execute("SELECT * FROM threads WHERE subforum = ?", subforum[0])
+				for thread in threads
+					db.execute("DELETE FROM posts WHERE thread = ?", thread[0])
+				end
+				db.execute("DELETE FROM threads WHERE subforum = ?", subforum[0])
+			end
+			db.execute("DELETE FROM subforums WHERE forum = ?", forum_id)
+			db.execute("DELETE FROM forums WHERE id = ?", forum_id)
+
+			flash[:success] = "The forum and all its content have been deleted!"
+			redirect back
+		end
+	end
+
+	post '/admin/subforum/new' do
+		unless @admin
+			session[:denied] = "You do not have permission to create a new subforum."
+			redirect '/denied'
+		end
+
+		forum = params['forum']
+		name = params['name']
+		description = params['description']
+		if forum.nil?
+			flash[:error] = "You must select a forum category."
+			redirect back
+		elsif name.empty? || name.blank?
+			flash[:error] = "Subforum name must not be empty."
+			redirect back
+		else
+			db.execute("INSERT INTO subforums (name, description, forum) VALUES (?, ?, ?)", name, description, forum)
+		end
+
+		flash[:success] = "Subforum has been created!"
+		redirect back
+	end
+	
+	post '/admin/subforum/modify' do
+		unless @admin
+			session[:denied] = "You do not have permission to modify subforums."
+			redirect '/denied'
+		end
+
+		subforum = params['subforum']
+		name = params['name']
+		description = params['description']
+
+		if subforum.nil?
+			flash[:error] = "You must select a subforum."
+			redirect back
+		elsif name.empty? || name.blank?
+			flash[:error] = "Subforum name must not be empty."
+			redirect back
+		else
+			db.execute("UPDATE subforums SET name = ?, description = ? WHERE id = ?", name, description, subforum)
+			flash[:success] = "Subforum has been updated!"
+			redirect back
+		end
+	end
 end

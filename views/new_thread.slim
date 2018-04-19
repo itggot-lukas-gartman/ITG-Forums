@@ -1,6 +1,6 @@
 ==display :'utils/flash'
 h2 Create a new thread
-form action="/subforum/new" method="POST"
+form action="/thread/new" name="newThread" method="POST"
     input type="hidden" name="id" value="#{@id}"
     p Title
     -if session[:thread_title].nil?

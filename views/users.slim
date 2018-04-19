@@ -1,4 +1,4 @@
--unless @admins.nil?
+-unless @admins.empty?
     div.user-group
         div.divider Administrators
         -for admin in @admins
@@ -10,7 +10,7 @@
                     a href="/profile/#{admin[1]}" #{admin[1]}
                     p Last seen: #{DateTime.parse(admin[6]).strftime("%F at %l:%M %p")}
                 
--unless @mods.nil?
+-unless @mods.empty?
     div.user-group
         div.divider Moderators
         -for mod in @mods
@@ -22,7 +22,7 @@
                     a href="/profile/#{mod[1]}" #{mod[1]}
                     p Last seen: #{DateTime.parse(mod[6]).strftime("%F at %l:%M %p")}
 
--unless @users.nil?
+-unless @users.empty?
     div.user-group
         div.divider Users
         -for user in @users
