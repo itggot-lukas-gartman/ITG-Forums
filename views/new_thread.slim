@@ -1,6 +1,8 @@
+javascript:
+    closeWarning(this);
 ==display :'utils/flash'
 h2 Create a new thread
-form action="/thread/new" name="newThread" method="POST"
+form action="/thread/new" name="newThread" id="newThread" method="POST"
     input type="hidden" name="id" value="#{@id}"
     p Title
     -if session[:thread_title].nil?

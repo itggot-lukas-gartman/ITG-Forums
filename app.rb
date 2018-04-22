@@ -21,9 +21,6 @@ class App < Sinatra::Base
 	# helpers Sinatra::Streaming
 	
 	db = SQLite3::Database.open('db/database.sqlite')
-	# $user = false
-	# $mod = false
-	# $admin = false
 
 	before do
 		if @title.nil?
@@ -31,13 +28,19 @@ class App < Sinatra::Base
 		end
 
 		if session[:username]
-			@user = session[:username]
-			db.execute("UPDATE accounts SET last_active = (SELECT datetime('now')) WHERE username = ?", session[:username])
-			rank = db.execute("SELECT rank FROM accounts WHERE username = ?", session[:username]).first.first
-			if rank == 3
-				@admin = true
-			elsif rank == 2
-				@mod = true
+			begin
+				@user = session[:username]
+				db.execute("UPDATE accounts SET last_active = (SELECT datetime('now')) WHERE username = ?", session[:username])
+				rank = db.execute("SELECT rank FROM accounts WHERE username = ?", session[:username]).first.first
+				if rank == 3
+					@admin = true
+				elsif rank == 2	
+					@mod = true
+				end
+			rescue Exception => ex
+				flash[:error] = "An unknown error occurred. Please try again."
+				session.destroy
+				redirect '/'
 			end
 		else
 			@user = false
@@ -330,7 +333,7 @@ class App < Sinatra::Base
 			redirect '/denied'
 		end
 	end
-	
+
 	get '/subforum/:id/new' do
 		@title = "ITG Forums | New thread"
 		@id = params['id']
@@ -644,6 +647,7 @@ class App < Sinatra::Base
 		end
 		@forum_categories = db.execute("SELECT * FROM forums ORDER BY permission ASC")
 		@subforums = db.execute("SELECT * FROM subforums ORDER BY forum ASC")
+		@accounts = db.execute("SELECT * FROM accounts ORDER BY username ASC")
 
 		slim :admin
 	end
@@ -728,6 +732,7 @@ class App < Sinatra::Base
 		forum = params['forum']
 		name = params['name']
 		description = params['description']
+
 		if forum.nil?
 			flash[:error] = "You must select a forum category."
 			redirect back
@@ -748,20 +753,180 @@ class App < Sinatra::Base
 			redirect '/denied'
 		end
 
-		subforum = params['subforum']
-		name = params['name']
-		description = params['description']
+		modify = params['modify']
+		delete = params['delete']
 
+		subforum = params['subforum'].to_i
 		if subforum.nil?
 			flash[:error] = "You must select a subforum."
 			redirect back
-		elsif name.empty? || name.blank?
-			flash[:error] = "Subforum name must not be empty."
-			redirect back
-		else
-			db.execute("UPDATE subforums SET name = ?, description = ? WHERE id = ?", name, description, subforum)
-			flash[:success] = "Subforum has been updated!"
+		end
+
+		if modify
+			name = params['name']
+			description = params['description']
+
+			if name.empty? || name.blank?
+				flash[:error] = "Subforum name must not be empty."
+				redirect back
+			else
+				db.execute("UPDATE subforums SET name = ?, description = ? WHERE id = ?", name, description, subforum)
+				flash[:success] = "Subforum has been updated!"
+				redirect back
+			end
+		elsif delete
+			threads = db.execute("SELECT id FROM threads WHERE subforum = ?", subforum)
+			for thread in threads
+				db.execute("DELETE FROM posts WHERE thread = ?", thread.first)
+			end
+			db.execute("DELETE FROM threads WHERE subforum = ?", subforum)
+			db.execute("DELETE FROM subforums WHERE id = ?", subforum)
+
+			flash[:success] = "Subforum and all its content has been deleted!"
 			redirect back
 		end
+	end
+
+	post '/admin/account/modify' do
+		unless @admin
+			session[:denied] = "You do not have permission to modify subforums."
+			redirect '/denied'
+		end
+
+		update = params['update']
+		delete = params['delete']
+
+		account = params['account']
+
+		if update
+			username = params['username']
+			email = params['email']
+			new_password = params['new_password']
+			rank = params['rank'].to_i
+			profile_picture = params['profile_picture']
+
+			if account.nil?
+				flash[:error] = "You must select an account."
+				redirect back
+			elsif username.empty? || username.blank?
+				flash[:error] = "Username must not be empty."
+				redirect back
+			elsif email.empty? || email.blank?
+				flash[:error] = "Email must not be empty."
+				redirect back
+			elsif rank < 0 || rank > 3
+				flash[:error] = "Invalid rank."
+				redirect back
+			end
+
+			#Update user content
+			db.execute("UPDATE threads SET owner = ? WHERE owner = ?", username, account)
+			db.execute("UPDATE posts SET owner = ? WHERE owner = ?", username, account)
+
+			if new_password.empty? || new_password.blank?
+				db.execute("UPDATE accounts SET username = ?, email = ?, rank = ?, picture = ? WHERE username = ?", username, email, rank, profile_picture, account)
+			else
+				encrypted_pass = BCrypt::Password.create(new_password)
+				db.execute("UPDATE accounts SET username = ?, email = ?, encrypted_pass = ?, rank = ?, picture = ? WHERE username = ?", username, email, encrypted_pass, rank, profile_picture, account)
+			end
+
+			filename = Dir.glob("public/uploads/profile-picture/#{account}.*").first
+			filename = filename.split(".")
+			File.rename("#{filename[0]}.#{filename[-1]}", "public/uploads/profile-picture/#{username}.#{filename[-1]}")
+
+			if account == session[:username]
+				flash[:error] = "Changing your own account requires you to log back in."
+				session.destroy
+				redirect '/'
+			end
+
+			flash[:success] = "Account has been updated!"
+			redirect back
+		elsif delete
+			if account.nil?
+				flash[:error] = "You must select an account."
+				redirect back
+			end
+			
+			profile_picture = db.execute("SELECT picture FROM accounts WHERE username = ?", account).first.first
+
+			# db.execute("UPDATE threads SET owner = ? WHERE owner = ?", "deleted_account", account)
+			# db.execute("UPDATE posts SET owner = ? WHERE owner = ?", "deleted_account", account)
+			# db.execute("UPDATE accounts SET username = ?, picture = ? WHERE username = ?", "deleted_account", profile_picture, account)
+			unless profile_picture == "uploads/profile-picture/default.svg"
+				File.delete("public/#{profile_picture}") if File.exist?("public/#{profile_picture}")
+			end
+
+			threads = db.execute("SELECT id FROM threads WHERE owner = ?", account)
+			for thread in threads
+				db.execute("DELETE FROM posts WHERE thread = ?", thread.first)
+			end
+			db.execute("DELETE FROM threads WHERE owner = ?", account)
+			db.execute("DELETE FROM posts WHERE owner = ?", account)
+			db.execute("DELETE FROM accounts WHERE username = ?", account)
+			
+			flash[:success] = "Account has been deleted!"
+			redirect back
+		else
+			flash[:error] = "Invalid option."
+			redirect back
+		end
+	end
+
+
+	# API's
+    get '/api/subforum/:subforum' do
+		unless @admin
+			return "Permission denied. fuck u hacker"
+		end
+
+		subforum_id = params['subforum']
+		subforum = db.execute("SELECT * FROM subforums WHERE id = ?", subforum_id).first
+
+		json = {
+			'id' => subforum[0],
+			'name' => subforum[1],
+			'description' => subforum[2],
+			'forum' => subforum[3],
+			'permission' => subforum[4]
+		}
+		return JSON[json]
+	end
+
+    get '/api/forum/:forum' do
+		unless @admin
+			return "Permission denied. fuck u hacker"
+		end
+
+		forum_id = params['forum']
+		forum = db.execute("SELECT * FROM forums WHERE id = ?", forum_id).first
+
+		json = {
+			'id' => forum[0],
+			'forum_name' => forum[1],
+			'permission' => forum[2]
+		}
+		return JSON[json]
+	end
+
+    get '/api/profile/:user' do
+		unless @admin
+			return "Permission denied. fuck u hacker"
+		end
+
+		user = params['user']
+		account = db.execute("SELECT * FROM accounts WHERE username = ?", user).first
+		
+		json = {
+			'id' => account[0],
+			'username' => account[1],
+			'email' => account[3],
+			'rank' => account[4],
+			'picture' => account[5],
+			'last_active' => account[6],
+			'register_date' => account[7],
+			'reputation' => account[8]
+		}
+		return JSON[json]
 	end
 end

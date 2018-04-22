@@ -19,5 +19,8 @@ require 'date'
 #FileUtils for handling file uploads
 require 'fileutils'
 
+#JSON
+require 'json'
+
 #Run the app
 run App

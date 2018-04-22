@@ -10,7 +10,6 @@ html
 		
 		title = @title
 	body
-		/ div.dim
 		header
 			div.header-container
 				div.logo-container
@@ -30,13 +29,13 @@ html
 								
 					-if @user
 						img.profile-picture src="#{session[:profile_picture]}" onclick="toggleProfile()"
-						div.link onclick="toggleProfile()" #{@user}
+						div.link onclick="toggleProfile()" id="user" #{@user}
 						img.caret-down src="/img/caret-down.svg" onclick="toggleProfile()"
 					
 						div.user-menu.hidden id="user-menu"
 							a href="/profile/#{@user}" Profile
 							a href="/settings" Account settings
-							a href="/logout" Logout
+							a href="/logout" style="color: red" Logout
 					-else
 						a.button href="/register" Sign up
 		main
@@ -44,5 +43,7 @@ html
 				a.navitem href="/" Home
 				a.navitem href="/activity" Activity
 				a.navitem href="/users" Users
+				-if @admin
+					a.navitem href="/admin" Admin panel
 			div.content
 				== yield
