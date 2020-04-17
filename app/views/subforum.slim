@@ -1,0 +1,67 @@
+==display :'utils/flash'
+div.subforum-tools
+    h2 #{@subforum.name}
+    -if logged_in?
+        a.button href="./#{@subforum.id}/new_thread" New thread
+div.divider
+    -if @threads.nil?
+        | This subforum is empty
+    -else
+        | There are #{@threads.length} threads in this subforum
+
+/ Pagination
+-if @page_count > 1
+    div.pagination
+        -page = params['page']
+        -unless page.nil? || page.to_i == 1
+            a.button href="./#{@subforum.id}?page=#{page.to_i - 1}" Prev
+        -@page_count.times do |n|
+            -if page.to_i == n+1
+                a.button.active href="./#{@subforum.id}?page=#{n+1}" =n+1
+            -else
+                a.button href="./#{@subforum.id}?page=#{n+1}" =n+1
+        -unless page.to_i == @page_count
+            a.button href="./#{@subforum.id}?page=#{page.to_i + 1}" Next
+-unless @threads.nil?
+    -for thread in @threads
+        div.thread-container
+            div.thread-info
+                a href="/thread/#{thread.id}" #{thread.title}
+                span
+                    | By 
+                    a href="/profile/#{thread.owner}"
+                        | #{thread.owner.username}
+                    |, #{thread.date.strftime("%F")}
+            -latest_post = thread.get_latest_post
+            / No posts in thread - display thread info
+            -if latest_post.nil?
+                div.thread-stats
+                    div.picture
+                        a href="/profile/#{thread.owner.username}"
+                            img.profile-picture src="#{thread.owner.picture}"
+                    div.last-post
+                        a href="/profile/#{thread.owner.username}" #{thread.owner.username}
+                        span #{thread.date.strftime("%F")}
+            / There is a post - show post info
+            -else
+                div.thread-stats
+                    div.picture
+                        a href="/profile/#{latest_post.owner.username}"
+                            img.profile-picture src="#{latest_post.owner.picture}"
+                    div.last-post
+                        a href="/profile/#{latest_post.owner.username}" #{latest_post.owner.username}
+                        span #{thread.date.strftime("%F")}
+                        
+/ Pagination
+-if @page_count > 1
+    div.pagination
+        -page = params['page']
+        -unless page.nil? || page.to_i == 1
+            a.button href="./#{@subforum.id}?page=#{page.to_i - 1}" Prev
+        -@page_count.times do |n|
+            -if page.to_i == n+1
+                a.button.active href="./#{@subforum.id}?page=#{n+1}" =n+1
+            -else
+                a.button href="./#{@subforum.id}?page=#{n+1}" =n+1
+        -unless page.to_i == @page_count
+            a.button href="./#{@subforum.id}?page=#{page.to_i + 1}" Next

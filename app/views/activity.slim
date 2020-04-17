@@ -1,0 +1,17 @@
+==display :'utils/flash'
+h2 Recent activity
+-for activity in @activity
+    -next unless @user.has_rank?(activity.get_permission)
+    div.activity-thread-container
+        div.activity-info
+            -if activity.instance_of? Thread_
+                a href="/thread/#{activity.id}" #{activity.title}
+            -else
+                a href="/thread/#{activity.thread.id}" #{activity.thread.title}
+            span
+                | By 
+                a href="/profile/#{activity.owner.username}"
+                    | #{activity.owner.username}
+                |, #{activity.date.strftime("%F")}
+        div.activity-preview
+            p =activity.text

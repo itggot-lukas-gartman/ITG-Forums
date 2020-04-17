@@ -84,7 +84,6 @@ header {
 	width: 80vw;
 	max-width: 1300px;
 	margin: 0 auto;
-	/* transition: all 0.1s; */
 }
 
 .logo-container, .user-container {
@@ -120,13 +119,20 @@ header {
 	background-color: #304d66;
 	text-decoration: none;
 	border-radius: 2px;
-	text-align: center;
 	align-self: center;
 	margin-left: 10px;
+	border: none;
 }
 
-.button:hover {
+.button:hover:not(span) {
 	background-color: #3c5972;
+	cursor: pointer;
+}
+
+.button:disabled, .button:hover:disabled {
+	background-color: #304d66;
+	filter: contrast(50%);
+	cursor: default;
 }
 
 .active {
@@ -170,7 +176,7 @@ header {
 	margin-right: 5px;
 	width: 30px;
 	height: 30px;
-	object-fit: cover;
+	object-fit: cover; /* causes gif images to pause in Firefox */
 	overflow: hidden;
 	cursor: pointer;
 }
@@ -180,8 +186,8 @@ header {
 	flex-direction: column;
 	position: absolute;
 	top: 50px;
-	/* left: 80vw; */
-	margin-right: -20px;
+	/* margin-right: -20px; */
+	width: 130px;
 	padding: 10px;
 	background-color: white;
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
@@ -190,6 +196,7 @@ header {
 
 .user-menu > a {
 	text-decoration: none;
+	margin: 2px 0;
 }
 
 main {
@@ -199,7 +206,6 @@ main {
 	width: 80vw;
 	max-width: 1300px;
 	margin: -70px 0 20px 0;
-	/* transition: all 0.1s; */
 }
 
 nav {
@@ -256,6 +262,31 @@ nav {
 	margin-right: 5px;
 }
 
+.activity-thread-container {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	padding: 10px;
+}
+
+.activity-info {
+	display: flex;
+	flex-direction: column;
+	width: 250px;
+	margin-right: 5px;
+}
+
+.activity-preview {
+	width: 100%;
+	max-width: calc(100% - 250px);
+	color: grey;
+	font-style: italic;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	/* white-space: nowrap; */
+	height: 3.5em; /* 2 line preview */
+}
+
 .subforum-info > a, .subforum-last_post > a, .thread-info > a, .thread-stats > .last-post > a {
 	font-size: 1.2em;
 }
@@ -299,9 +330,7 @@ nav {
 	display: flex;
 	flex-direction: row;
 	justify-content: center;
-	/* margin: 10px; */
 	padding: 10px;
-	/* background-color: #3c6994; */
 }
 
 .thread-container {
@@ -311,7 +340,7 @@ nav {
 	padding: 10px;
 }
 
-.thread-container * a {
+.thread-container * a, .activity-thread-container * a {
 	text-decoration: none;
 	margin: 5px 0;
 }
@@ -387,7 +416,7 @@ form[action="/subforum/new"] > input[type="text"] {
 	width: 200px;
 }
 
-form[action="/thread/reply"] > textarea, form[action="/subforum/new"] > textarea {
+form[action="/thread/reply"] > textarea, form[action="/thread/new"] > textarea {
 	width: calc(100% - 20px);
 }
 
@@ -446,10 +475,6 @@ form[action="settings/password"] > input[type="text"], form[action="settings/pas
 
 
 /* Users */
-/* .users {
-	margin: 10px;
-} */
-
 .user-group {
 	display: flex;
 	flex-direction: column;
@@ -504,8 +529,6 @@ form[action="/profile/update-picture"] > input[type="file"] {
 }
 
 form[action="/profile/update-picture"] > label {
-	/* background: none;
-	border: none; */
 	cursor: pointer;
 	transition: 0.2s;
 }
@@ -528,12 +551,10 @@ form[action="/profile/update-picture"] > label:hover {
 @media screen and (max-width: 1000px) {
 	main {
 		width: 95vw;
-		/* transition: all 0.1s; */
 	}
 	
 	.header-container {
 		width: 95vw;
-		/* transition: all 0.1s; */
 	}
 }
 

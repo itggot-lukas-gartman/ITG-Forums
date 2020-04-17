@@ -5,4 +5,9 @@
 				= message
 	-else
 		div class=("alert alert-#{status}") 
-			= message
+			-if message.is_a? Array
+				ul
+					-for m in message
+						li = m
+			-else
+				= message

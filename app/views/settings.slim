@@ -1,7 +1,7 @@
 ==display :'utils/flash'
 h2 Update email
 form action="/settings/email" method="POST"
-	input type="email" name="email" placeholder="Email" maxlength="254" value="#{@email}"
+	input type="email" name="email" placeholder="Email" maxlength="254" value="#{@user.email}"
 	input type="submit" value="Update email"
 
 h2 Update password

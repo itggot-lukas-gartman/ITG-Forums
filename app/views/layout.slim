@@ -15,7 +15,7 @@ html
 				div.logo-container
 					a.logo href="/" ITG Forums
 				div.user-container
-					-unless @user
+					-unless logged_in?
 						div.link onclick="toggleLogin()" Existing user? Sign in
 						img.caret-down src="/img/caret-down.svg" onclick="toggleLogin()"
 						
@@ -27,13 +27,13 @@ html
 									input type="checkbox" name="remember" Remember me
 								input type="submit" value="Login"
 								
-					-if @user
-						img.profile-picture src="#{session[:profile_picture]}" onclick="toggleProfile()"
-						div.link onclick="toggleProfile()" id="user" #{@user}
+					-if logged_in?
+						img.profile-picture src="#{@user.picture}" onclick="toggleProfile()"
+						div.link onclick="toggleProfile()" id="user" =@user.username
 						img.caret-down src="/img/caret-down.svg" onclick="toggleProfile()"
 					
 						div.user-menu.hidden id="user-menu"
-							a href="/profile/#{@user}" Profile
+							a href="/profile/#{@user.username}" Profile
 							a href="/settings" Account settings
 							a href="/logout" style="color: red" Logout
 					-else
@@ -43,7 +43,7 @@ html
 				a.navitem href="/" Home
 				a.navitem href="/activity" Activity
 				a.navitem href="/users" Users
-				-if @admin
+				-if @user.has_rank?(:admin)
 					a.navitem href="/admin" Admin panel
 			div.content
 				== yield

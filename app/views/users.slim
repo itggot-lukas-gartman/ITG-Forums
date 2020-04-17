@@ -1,0 +1,35 @@
+-unless @admins.empty?
+    div.user-group
+        div.divider Administrators
+        -for admin in @admins
+            div.user
+                div.user-picture
+                    a href="/profile/#{admin.username}"
+                        img.profile-picture src="#{admin.picture}"
+                div.user-info
+                    a href="/profile/#{admin.username}" #{admin.username}
+                    p Last seen: #{admin.last_active.strftime("%F at %l:%M %p")}
+                
+-unless @mods.empty?
+    div.user-group
+        div.divider Moderators
+        -for mod in @mods
+            div.user
+                div.user-picture
+                    a href="/profile/#{mod.username}"
+                        img.profile-picture src="#{mod.picture}"
+                div.user-info
+                    a href="/profile/#{mod.username}" #{mod.username}
+                    p Last seen: #{mod.last_active.strftime("%F at %l:%M %p")}
+
+-unless @users.empty?
+    div.user-group
+        div.divider Users
+        -for user in @users
+            div.user
+                div.user-picture
+                    a href="/profile/#{user.username}"
+                        img.profile-picture src="#{user.picture}"
+                div.user-info
+                    a href="/profile/#{user.username}" #{user.username}
+                    p Last seen: #{user.last_active.strftime("%F at %l:%M %p")}

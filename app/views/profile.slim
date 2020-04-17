@@ -1,0 +1,24 @@
+==display :'utils/flash'
+div.profile-info
+    div
+        -if @user.id == @account.id || @user.has_rank?(:admin)
+            form id="update-picture" action="/profile/update-picture" enctype="multipart/form-data" method="POST"
+                input type="hidden" name="username" value="#{@account.username}"
+                label for="picture-file"
+                    img.edit-image src="#{@account.picture}" title="Update picture"
+                input id="picture-file" type="file" name="file"
+        -else
+            img src="#{@account.picture}"
+    div.profile-username
+        h1 =@account.username
+        -if @account.has_rank? :admin
+            p.red Administrator
+        -elsif @account.has_rank? :mod
+            p.green Moderator
+        -elsif @account.has_rank? :banned
+            p Banned
+div.profile-stats
+    p Joined: #{@account.register_date}
+    p Last active: #{@account.last_active.strftime("%F")}
+    p Post count: #{@account.post_count}
+    p Reputation: #{@account.reputation}

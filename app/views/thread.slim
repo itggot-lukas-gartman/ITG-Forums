@@ -1,0 +1,61 @@
+==display :'utils/flash'
+div.thread
+    h2 #{@thread.title}
+    div.divider
+        -if @posts.count == 0
+            | There are no replies in this thread
+        -elsif @posts.count == 1
+            | There is one reply in this thread
+        -else
+            | There are #{@posts.count} replies in this thread
+
+    div.post
+        div.post-owner
+            a href="/profile/#{@thread.owner.username}" #{@thread.owner.username}
+            img.profile-picture src="#{@thread.owner.picture}"
+            p #{@thread.owner.post_count} posts
+            p #{@thread.owner.reputation} rep
+        div.post-content
+            pre
+                p #{@thread.text}
+            div.post-tools
+                i.post-date Posted on #{@thread.date.strftime("%b %e %Y at %R")}
+                div
+                    -if logged_in?
+                        -is_disabled = Vote.has_voted?(@thread.id, 0, @user.username) || @thread.owner.username == @user.username ? "disabled" : nil
+                        button.button onclick="upvote('thread-#{@thread.id}')" disabled=is_disabled +
+                        button.button onclick="downvote('thread-#{@thread.id}')" disabled=is_disabled -
+                    span.button id="thread-#{@thread.id}" =@thread.rating
+
+    -@posts.each_with_index do |post, i|
+        div.post
+            div.post-owner
+                a href="/profile/#{post.owner.username}" #{post.owner.username}
+                img.profile-picture src="#{post.owner.picture}"
+                p #{post.owner.post_count} posts
+                p #{post.owner.reputation} rep
+            div.post-content
+                pre
+                    p #{post.text}
+                div.post-tools
+                    i.post-date Posted on #{post.date.strftime("%b %e %Y at %R")}
+                    div
+                        -if logged_in?
+                            -is_disabled = Vote.has_voted?(post.thread.id, post.id, @user.username) || post.owner.username == @user.username ? "disabled" : nil
+                            button.button onclick="upvote('post-#{post.id}')" disabled=is_disabled +
+                            button.button onclick="downvote('post-#{post.id}')" disabled=is_disabled -
+                        span.button id="post-#{post.id}" =post.rating
+
+    -if logged_in?
+        form action="/thread/reply" id="reply" method="POST"
+            input name="thread_id" type="hidden" value="#{@thread.id}"
+            -if session[:reply_msg].nil?
+                textarea name="message" placeholder="Reply to this thread..." required=""
+            / -response.delete_cookie 'reply_message'
+            -else
+                textarea name="message" placeholder="Reply to this thread..." required="" #{session[:reply_msg]}
+                -session.delete(:reply_msg)
+            input type="submit" value="Submit reply"
+
+javascript:
+    closeWarning(this);

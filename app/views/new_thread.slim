@@ -1,14 +1,12 @@
-javascript:
-    closeWarning(this);
 ==display :'utils/flash'
 h2 Create a new thread
 form action="/thread/new" name="newThread" id="newThread" method="POST"
-    input type="hidden" name="id" value="#{@id}"
+    input type="hidden" name="subforum_id" value="#{@subforum.id}"
     p Title
     -if session[:thread_title].nil?
-        input type="text" name="title" placeholder="Title" maxlength="40" required=""
+        input type="text" name="title" placeholder="Title" maxlength="40" required="" autocomplete="off"
     -else
-        input type="text" name="title" placeholder="Title" maxlength="40" required="" value="#{session[:thread_title]}"
+        input type="text" name="title" placeholder="Title" maxlength="40" required="" autocomplete="off" value="#{session[:thread_title]}"
         -session.delete(:thread_title)
     p Content
     -if session[:thread_text].nil?
@@ -17,3 +15,5 @@ form action="/thread/new" name="newThread" id="newThread" method="POST"
         textarea name="text" placeholder="Type your text here..." required="" #{session[:thread_text]}
         -session.delete(:thread_text)
     input type="submit" value="Create thread"
+javascript:
+    closeWarning(this);

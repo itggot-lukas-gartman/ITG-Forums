@@ -1,0 +1,24 @@
+==display :'utils/flash'
+h2 Forum categories
+-for forum in @forums
+	-next unless @user.has_rank?(forum.permission)
+	div.category
+		div.divider #{forum.name}
+		-for subforum in forum.subforums
+			-if subforum.forum_id == forum.id
+				div.subforum
+					div.subforum-info
+						a href="/subforum/#{subforum.id}" #{subforum.name}
+						p #{subforum.description}
+					div.subforum-last_post
+						-latest_post = subforum.get_latest
+						-unless latest_post.nil?
+							-if latest_post.instance_of? Thread_
+								a href="/thread/#{latest_post.id}" #{latest_post.title}
+							-elsif latest_post.instance_of? Post
+								a href="/thread/#{latest_post.thread.id}" #{latest_post.thread.title}
+							span
+								| By 
+								a href="/profile/#{latest_post.owner.username}"
+									| #{latest_post.owner.username}
+								|, #{latest_post.date.strftime("%F")}

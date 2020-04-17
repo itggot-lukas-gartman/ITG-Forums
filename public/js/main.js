@@ -1,25 +1,3 @@
-function toggleLogin() {
-	document.getElementById("login-form").classList.toggle("hidden");
-}
-
-function toggleProfile() {
-	document.getElementById("user-menu").classList.toggle("hidden");
-}
-
-function closeWarning(test) {
-	window.onbeforeunload = function () {
-		var title = document.forms["newThread"]["title"].value;
-		var text = document.forms["newThread"]["text"].value;
-		if (title != "" || text != "") {
-			return confirm("Are you sure you want to close the current window? Any text entered will be lost.")
-		}
-	};
-
-	$(document).submit(function() {
-		window.onbeforeunload = null;
-	});
-}
-
 $(document).ready(function() {
 	$('#picture-file').change(function() {
 		var fileSize = (this.files[0].size);
@@ -42,34 +20,82 @@ $(document).click(function(event) {
 	}
 });
 
-function newServerAjaxCall(url, data, code) {
-    var request = new XMLHttpRequest();
-    request.onreadystatechange = function() {
-        if (this.readyState === 4) {
-            if (this.status === 200) {
-                eval(code);
-            } else {
-                console.log("Error appeared for server ajax call: '" + url + "'");
-                console.log(this.responseText);
-            }
-        }
-    };
-    request.open("POST", url, true);
-    if (data === null) {
-        request.send();
-    } else {
-        request.send(data);
-    }
+function toggleLogin() {
+	document.getElementById("login-form").classList.toggle("hidden");
 }
 
-function upvote(id) {
-	var rep = parseInt(document.getElementById(id).innerHTML);
-	document.getElementById(id).innerHTML = ++rep;
+function toggleProfile() {
+	document.getElementById("user-menu").classList.toggle("hidden");
 }
 
-function downvote(id) {
-	var rep = parseInt(document.getElementById(id).innerHTML);
-	document.getElementById(id).innerHTML = --rep;
+function closeWarning(data) {
+	$(document).submit(function() {
+		window.onbeforeunload = null;
+	});
+	
+	window.onbeforeunload = function () {
+		var showDialog = false;
+
+		var thread = data.document.getElementById("reply");
+		var new_thread = data.document.getElementById("newThread");
+
+		if (thread) {
+			var reply = document.forms["reply"]["message"].value;
+			if (reply != "") {
+				showDialog = true;
+			}
+		} else if (new_thread) {
+			var title = document.forms["newThread"]["title"].value;
+			var text = document.forms["newThread"]["text"].value;
+			if (title != "" || text != "") {
+				showDialog = true;
+			}
+		}
+
+		if (showDialog) {
+			return confirm("Are you sure you want to close the current window? Any text entered will be lost.")
+		}
+	};
+}
+
+function upvote(str) {
+	ary = str.split("-")
+	var type = ary[0];
+	var id = ary[1];
+
+	$.post(window.location.origin + `/${type}/${id}/upvote`, function() {
+		var rep = document.getElementById(str);
+		// Increase the rep count display
+		var rep_int = parseInt(rep.innerHTML);
+		document.getElementById(str).innerHTML = ++rep_int;
+
+		// Disable buttons
+		var rep_parent_nodes = rep.parentNode.childNodes;
+		rep_parent_nodes[1].setAttribute("disabled", "disabled");
+		rep_parent_nodes[2].setAttribute("disabled", "disabled");
+		rep_parent_nodes[1].removeAttribute("onclick");
+		rep_parent_nodes[2].removeAttribute("onclick");
+	});
+}
+
+function downvote(str) {
+	ary = str.split("-")
+	var type = ary[0];
+	var id = ary[1];
+
+	$.post(window.location.origin + `/${type}/${id}/downvote`, function() {
+		var rep = document.getElementById(str);
+		// Decrease the rep count display
+		var rep_int = parseInt(rep.innerHTML);
+		document.getElementById(str).innerHTML = --rep_int;
+
+		// Disable buttons
+		var rep_parent_nodes = rep.parentNode.childNodes;
+		rep_parent_nodes[1].setAttribute("disabled", "disabled");
+		rep_parent_nodes[2].setAttribute("disabled", "disabled");
+		rep_parent_nodes[1].removeAttribute("onclick");
+		rep_parent_nodes[2].removeAttribute("onclick");
+	});
 }
 
 function setAccountFields(e) {
@@ -86,7 +112,6 @@ function setAccountFields(e) {
 		window.alert("Changing your own account will sign you out.");
 	}
 }
-
 
 function setForumFields(e) {
 	forum = e.options[e.selectedIndex].value;
